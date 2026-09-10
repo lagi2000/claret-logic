@@ -1,0 +1,1002 @@
+[
+  {
+    "level": 1,
+    "size": 3,
+    "solutions": 27,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": false,
+    "rating": 0
+  },
+  {
+    "level": 2,
+    "size": 3,
+    "solutions": 4,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": false,
+    "rating": 0
+  },
+  {
+    "level": 3,
+    "size": 4,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 58
+  },
+  {
+    "level": 4,
+    "size": 4,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 58
+  },
+  {
+    "level": 5,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 35
+  },
+  {
+    "level": 6,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 7,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 8,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 9,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 10,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 18
+  },
+  {
+    "level": 11,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 18
+  },
+  {
+    "level": 12,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 13,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 35
+  },
+  {
+    "level": 14,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 15,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 16,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 5
+  },
+  {
+    "level": 17,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 18
+  },
+  {
+    "level": 18,
+    "size": 5,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 18
+  },
+  {
+    "level": 19,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 20,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 21,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 22,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 23,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 24,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 25,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 26,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 27,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 28,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 29,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 34
+  },
+  {
+    "level": 30,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 34
+  },
+  {
+    "level": 31,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 34
+  },
+  {
+    "level": 32,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 34
+  },
+  {
+    "level": 33,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 34,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 35,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 36,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 37,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 38,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 39,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 40,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 41,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 42,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 43,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 19
+  },
+  {
+    "level": 44,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 19
+  },
+  {
+    "level": 45,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 19
+  },
+  {
+    "level": 46,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 19
+  },
+  {
+    "level": 47,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 19
+  },
+  {
+    "level": 48,
+    "size": 6,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 6
+  },
+  {
+    "level": 49,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 50,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 7
+  },
+  {
+    "level": 51,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 52,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 53,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 54,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 24
+  },
+  {
+    "level": 55,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 56,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 57,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 24
+  },
+  {
+    "level": 58,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 59,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 60,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 24
+  },
+  {
+    "level": 61,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 22
+  },
+  {
+    "level": 62,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 22
+  },
+  {
+    "level": 63,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 64,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 22
+  },
+  {
+    "level": 65,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 24
+  },
+  {
+    "level": 66,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 67,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 22
+  },
+  {
+    "level": 68,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 69,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 70,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 71,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 72,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 73,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 41
+  },
+  {
+    "level": 74,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 7
+  },
+  {
+    "level": 75,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 24
+  },
+  {
+    "level": 76,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 35
+  },
+  {
+    "level": 77,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 78,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 79,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 7
+  },
+  {
+    "level": 80,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 41
+  },
+  {
+    "level": 81,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 82,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 83,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 84,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 85,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 7
+  },
+  {
+    "level": 86,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 87,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 35
+  },
+  {
+    "level": 88,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 39
+  },
+  {
+    "level": 89,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 61
+  },
+  {
+    "level": 90,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 7
+  },
+  {
+    "level": 91,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 41
+  },
+  {
+    "level": 92,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 93,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 94,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 95,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 33
+  },
+  {
+    "level": 96,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 7
+  },
+  {
+    "level": 97,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 20
+  },
+  {
+    "level": 98,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 35
+  },
+  {
+    "level": 99,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 39
+  },
+  {
+    "level": 100,
+    "size": 7,
+    "solutions": 1,
+    "capped": false,
+    "connected": true,
+    "referenceValid": true,
+    "pedagogical": true,
+    "rating": 61
+  }
+]

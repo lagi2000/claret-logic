@@ -1,0 +1,28 @@
+{
+  "certified": 100,
+  "blockers": [],
+  "consecutiveRepeatedSolutions": [],
+  "geometricDuplicates": [],
+  "ratingBySize": [
+    {
+      "size": 4,
+      "min": 4,
+      "max": 43
+    },
+    {
+      "size": 5,
+      "min": 5,
+      "max": 44
+    },
+    {
+      "size": 6,
+      "min": 19,
+      "max": 64
+    },
+    {
+      "size": 7,
+      "min": 33,
+      "max": 91
+    }
+  ]
+}
