@@ -1,4 +1,4 @@
-# Claret Logic · 3.0.0 RC3
+# Claret Logic · 3.0.0 RC4
 
 Dos prácticas iniciales y **100 retos certificados de solución única**, según el ajuste aprobado por Luis. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución. Portada aprobada, reglas, vidas, ayudas, rangos y racha diaria conservados.
 

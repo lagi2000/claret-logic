@@ -1,3 +1,9 @@
+# 3.0.0 RC4
+
+- Añadido a la portada el crédito «Creado por: Luis A. García · Claret Sevilla».
+- Integrado como placa discreta y responsive sin alterar la composición ni el acceso al juego.
+- Centrado vertical móvil con aire superior e inferior y respeto de las zonas seguras del dispositivo.
+
 # Ajuste pedagógico · pensamiento autónomo
 
 - Cruces automáticas limitadas a las dos prácticas iniciales.

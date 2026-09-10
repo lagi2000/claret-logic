@@ -1,5 +1,5 @@
 const PREFIX='claret-logic-'+encodeURIComponent(new URL(self.registration.scope).pathname)+'-';
-const CACHE=PREFIX+'cc1a5b307ce1';
+const CACHE=PREFIX+'02c969845769';
 const ASSETS=["./","./.nojekyll","./assets/claret.jpeg","./assets/cover.png","./assets/icon-192.png","./assets/icon-512.png","./assets/maria-reference.png","./index.html","./js/app.js","./js/engine.js","./js/feedback.js","./js/levels.js","./js/pedagogy.js","./js/state.js","./js/tutorials.js","./manifest.webmanifest","./styles.css"];
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)));});
 self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
