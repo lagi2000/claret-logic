@@ -10,7 +10,7 @@ Semilla: 20260909. Generador congruencial de 32 bits, sin librerías externas.
 4. Enumerar respuestas con un solver independiente. Detener al encontrar la segunda durante la selección; conservar únicamente una.
 5. Resolver con deducciones hacia delante. Rechazar si el solver pedagógico se atasca.
 6. Eliminar duplicados equivalentes por giros, reflejos o cambios de nombre de región.
-7. Seleccionar una progresión según dificultad, evitando repetir la solución del tablero anterior.
+7. Seleccionar una progresión según dificultad, sin repetir ninguna disposición de solución dentro del mismo tamaño de tablero.
 
 La certificación vuelve a contar soluciones y verifica las posiciones de referencia. La clave de respuesta no interviene al colocar una hipótesis ni en el solver pedagógico.
 
@@ -31,13 +31,13 @@ Las ayudas recorren la traza hasta el primer paso pendiente. Primero muestran la
 
 Mide longitud de la resolución, deducciones entre unidades y amplitud de comparación. No utiliza el tamaño ni los nodos de búsqueda como puntuación de dificultad. Es una estimación lógica, no una medida empírica del tiempo o de la dificultad para alumnado de 4.º.
 
-Bandas de selección: 4×4, 0–45; 5×5, 0–45; 6×6, 18–65; 7×7, 32–100. El orden crece aproximadamente dentro de cada tamaño. El comienzo de un nuevo tamaño introduce un descanso relativo para adaptarse a la superficie. Evitar una respuesta consecutiva idéntica puede introducir pequeñas oscilaciones locales. No se promete una curva estrictamente ascendente en cada nivel.
+Bandas de selección: 4×4, 0–45; 5×5, 0–45; 6×6, 18–65; 7×7, 32–100. El orden crece aproximadamente dentro de cada tamaño. El comienzo de un nuevo tamaño introduce un descanso relativo para adaptarse a la superficie. La exigencia de no repetir ninguna disposición puede introducir pequeñas oscilaciones locales. No se promete una curva estrictamente ascendente en cada nivel.
 
-La tabla completa está en difficulty.csv. Los intervalos finales son 4–43, 5–44, 19–64 y 33–91 para 4×4 a 7×7. Conviene calibrarlos después con observación de jugadores; no se añade telemetría ni se recopilan datos en esta versión.
+La tabla completa está en difficulty.csv. Los intervalos finales son 4–43, 5–44, 19–60 y 33–76 para 4×4 a 7×7. Conviene calibrarlos después con observación de jugadores; no se añade telemetría ni se recopilan datos en esta versión.
 
 ## Garantía y frontera
 
-100/100 retos de campaña tienen unicidad, conectividad, respuesta coherente y traza deductiva. Las dos prácticas están fuera de la campaña por decisión expresa de Luis. El comando estricto termina correctamente y registra logicCertified=true. Ese campo certifica la lógica, no los navegadores de destino.
+100/100 retos de campaña tienen unicidad, conectividad, respuesta coherente, traza deductiva y una disposición de solución distinta dentro de su tamaño. Las dos prácticas están fuera de la campaña por decisión expresa de Luis. El comando estricto termina correctamente y registra logicCertified=true. Ese campo certifica la lógica, no los navegadores de destino.
 
 
-RC2 conserva los 98 puzzles seleccionados para RC1, renumera desde 1 y añade dos puzzles 7×7 certificados al final. Total de campaña: dos 4×4, catorce 5×5, treinta 6×6 y cincuenta y cuatro 7×7.
+La campaña contiene dos retos 4×4, catorce 5×5, treinta 6×6 y cincuenta y cuatro 7×7. El generador combina mutaciones certificadas y crecimiento de regiones desde una solución válida para cubrir exactamente 100 patrones de respuesta diferentes.

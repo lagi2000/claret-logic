@@ -4,9 +4,10 @@ import {autoMarks,diagnose,groups} from './engine.js';
 import {nextHint} from './pedagogy.js';
 import {KEY,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
 import {play,haptic,celebrate} from './feedback.js';
+import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
 const $=s=>document.querySelector(s), board=$('#board');
 let storage;try{storage=window.localStorage;}catch{}
-const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null;
+const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null;
 const palette=['#ffc8d9','#bde9d2','#bfe2ff','#ffe69b','#d9c8ff','#ffd5ad','#bdeef0'];
 const current=()=>practice??state, level=()=>practice?tutorials[practice.index]:levels[state.index];
 function persist(){if(practice&&onboarding){state.tutorialIndex=practice.index;state.tutorialRound=structuredClone(practice.round);}if(!save(storage,state))$('#storageWarning').hidden=false;}
@@ -22,8 +23,9 @@ function stats(){
   $('#count').textContent=`${Object.values(s.round.marks).filter(v=>v==='c').length}/${L.size}`;
   $('#tip').textContent=L.tip;
   $('#boardNote').textContent=practice?'Al colocar a Claret verás las consecuencias de tu elección.':'Las cruces solo aparecen cuando tú las colocas.';
-  $('#check').textContent=s.round.solved?(practice&&s.index===1?(onboarding?'Empezar los retos':'Volver a mi partida'):s.index===99?'Completado':'Siguiente'):'Comprobar';
-  $('#check').disabled=s.round.solved&&s.index===99;
+  const milestone=!practice&&s.round.solved&&(s.index+1)%10===0;
+  $('#check').textContent=s.round.solved?(practice&&s.index===1?(onboarding?'Empezar los retos':'Volver a mi partida'):milestone?'Ver logro':'Ver recorrido'):'Comprobar';
+  $('#check').disabled=milestone;
   $('#reset').disabled=s.round.solved;$('#hint').disabled=s.round.solved||(!practice&&s.helps===0);
   $('#leavePractice').hidden=!practice||onboarding;
   $('#sound').setAttribute('aria-pressed',String(state.sound));$('#sound').setAttribute('aria-label',state.sound?'Desactivar sonido':'Activar sonido');$('#sound').textContent=state.sound?'♪':'♪̸';
@@ -91,17 +93,19 @@ function showHint(){
   $('#hintText').hidden=false;persist();drawBoard();play('place',state.sound);
 }
 function check(){
-  const s=current();if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}if(nextLevel(s)){persist();redraw();board.focus();}return;}
+  const s=current();if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}if(nextLevel(s)){persist();openMap();}else openMap(9);return;}
   const result=diagnose(level(),s.round.marks);highlights=result.cells;
   if(result.ok){
     if(practice)s.round.solved=true;else complete(s);persist();drawBoard();
-    message(practice?'¡Correcto! Práctica completada.':s.index===99?'¡Has completado Claret Logic! Tu rango es Mente Claret.':(s.index+1)%10===0?`¡Reto superado! Nuevo rango: ${earnedRank(s.completed)}.`:'¡Correcto! Reto superado.','success');
-    $('#hintText').hidden=true;play('win',state.sound);haptic();celebrate(!practice&&(s.index+1)%10===0);
+    const milestone=!practice&&(s.index+1)%10===0;
+    message(practice?'¡Correcto! Práctica completada.':s.index===99?'¡Has completado Claret Logic! Tu rango es Mente Claret.':milestone?`¡Reto superado! Nuevo rango: ${earnedRank(s.completed)}.`:'¡Correcto! Reto superado.','success');
+    $('#hintText').hidden=true;play('win',state.sound);haptic();celebrate(milestone);
+    if(milestone){pendingAchievement=worldIndexForLevel(s.index);setTimeout(openAchievement,450);}
   }else{drawBoard();message(result.message,'error');play('error',state.sound);}
 }
-function startGame(){ if(!practice&&!state.tutorialDone){practice=beginTutorial(state);onboarding=true;redraw();} $('#start').hidden=true;$('#game').hidden=false;$('#game').inert=false;stats();$('#toolClaret').focus();if(state.daily.last<dateKey())openDaily(); }
-function home(){persist();practice=null;onboarding=false;$('#start').hidden=false;$('#game').hidden=true;$('#game').inert=true;redraw();$('#play').focus();}
-function leavePractice(){practice=null;onboarding=false;redraw();$('#toolClaret').focus();}
+function startGame(){ if(!practice&&!state.tutorialDone){practice=beginTutorial(state);onboarding=true;redraw();} $('#start').hidden=true;$('#worldMap').hidden=true;$('#worldMap').inert=true;$('#game').hidden=false;$('#game').inert=false;stats();$('#toolClaret').focus();if(state.daily.last<dateKey())openDaily(); }
+function home(){persist();practice=null;onboarding=false;$('#start').hidden=false;$('#worldMap').hidden=true;$('#worldMap').inert=true;$('#game').hidden=true;$('#game').inert=true;redraw();$('#play').focus();}
+function leavePractice(){practice=null;onboarding=false;redraw();openMap();}
 function renderDaily(){
   $('#dailyCount').textContent=state.daily.current;$('#dailyBest').textContent=`Mejor racha: ${state.daily.best}`;
   const now=new Date(),today=dateKey(now),monday=new Date(now);monday.setDate(now.getDate()-(now.getDay()+6)%7);
@@ -110,7 +114,45 @@ function renderDaily(){
   const activated=state.daily.last>=today;$('#dailyContinue').disabled=!activated;$('#heart').disabled=activated;$('#heart').classList.toggle('lit',activated);
 }
 function openDaily(){renderDaily();$('#daily').showModal();}
-$('#play').onclick=()=>openRuleCards(startGame);$('#home').onclick=e=>{e.preventDefault();home();};
+function drawMap(){
+  const W=worlds[mapWorld],unlocked=unlockedWorldIndex(state),start=mapWorld*10;
+  $('#worldScene').style.setProperty('--world-tone',W.tone);$('#worldArt').src=`./assets/worlds/${W.art}`;$('#worldArt').alt=`Escenario de ${W.place}`;
+  $('#worldNumber').textContent=`MUNDO ${mapWorld+1} DE 10`;$('#worldTitle').textContent=W.place;$('#worldRange').textContent=W.range;$('#worldRank').textContent=W.rank;$('#worldDescription').textContent=W.description;
+  $('#routeLine').setAttribute('points',routePoints.map(p=>p.join(',')).join(' '));
+  const nodes=$('#levelNodes');nodes.replaceChildren();
+  routePoints.forEach(([x,y],i)=>{
+    const number=start+i+1,done=number<=state.completed,current=number===state.index+1&&state.completed<100,available=mapWorld<=unlocked&&(done||current);
+    const b=document.createElement('button');b.type='button';b.className='levelnode';b.style.left=x+'%';b.style.top=y+'%';b.textContent=done?'✓':number;b.dataset.level=number;
+    b.classList.toggle('done',done);b.classList.toggle('current',current);b.classList.toggle('locked',!available);b.disabled=!current;
+    b.setAttribute('aria-label',done?`Reto ${number}, superado`:current?`Reto ${number}, continuar`: `Reto ${number}, bloqueado`);
+    if(current)b.onclick=startGame;nodes.append(b);
+  });
+  $('#previousWorld').disabled=mapWorld===0;$('#nextWorld').disabled=mapWorld>=unlocked||mapWorld===9;
+  $('#worldDots').textContent=worlds.map((_,i)=>i===mapWorld?'●':i<=unlocked?'•':'·').join(' ');
+}
+function openMap(index=worldIndexForLevel(state.completed>=100?99:state.index)){
+  // A solved round can survive a refresh. Resume the journey without leaving
+  // the player on a map where every visible node is disabled.
+  if(state.round.solved&&state.completed===state.index+1&&(state.index+1)%10!==0&&state.index<99){nextLevel(state);index=worldIndexForLevel(state.index);}
+  persist();practice=null;onboarding=false;mapWorld=Math.min(unlockedWorldIndex(state),Math.max(0,index));
+  $('#start').hidden=true;$('#game').hidden=true;$('#game').inert=true;$('#worldMap').hidden=false;$('#worldMap').inert=false;drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});
+  if(state.round.solved&&state.completed===state.index+1&&(state.index+1)%10===0){pendingAchievement=worldIndexForLevel(state.index);setTimeout(openAchievement,120);}
+}
+function renderCollection(){
+  const grid=$('#badgeGrid');grid.replaceChildren();
+  worlds.forEach((W,i)=>{const unlocked=state.completed>=(i+1)*10,card=document.createElement('article');card.className='badgecard';card.classList.toggle('locked',!unlocked);card.innerHTML=`<span class="badge-medal" aria-hidden="true">${W.symbol}</span><strong>${unlocked?W.rank:'Por descubrir'}</strong><small>${W.place} · ${W.range}</small>`;grid.append(card);});
+}
+function openAchievement(){
+  if(pendingAchievement===null||$('#achievement').open)return;const W=worlds[pendingAchievement];
+  $('#achievementBadge').textContent=W.symbol;$('#achievement').style.setProperty('--world-tone',W.tone);$('#achievementTitle').textContent=W.rank;
+  $('#achievementCopy').textContent=pendingAchievement===9?'Has superado los 100 retos y alcanzado el rango máximo: Mente Claret.':'Has superado 10 nuevos retos. Tu insignia se ha añadido a la colección.';
+  $('#achievementContinue').textContent=pendingAchievement===9?'Ver mi recorrido completo':'Descubrir el siguiente mundo';$('#achievement').showModal();$('#achievementContinue').focus();
+}
+$('#play').onclick=()=>openRuleCards(openMap);$('#home').onclick=e=>{e.preventDefault();home();};$('#mapHome').onclick=home;
+$('#badges').onclick=()=>{renderCollection();$('#collection').showModal();};$('[data-close="collection"]').onclick=()=>$('#collection').close();
+$('#previousWorld').onclick=()=>{if(mapWorld>0){mapWorld--;drawMap();}};$('#nextWorld').onclick=()=>{if(mapWorld<unlockedWorldIndex(state)){mapWorld++;drawMap();}};
+$('#achievementContinue').onclick=()=>{const finished=pendingAchievement===9;$('#achievement').close();pendingAchievement=null;if(!finished)nextLevel(state);persist();openMap(finished?9:worldIndexForLevel(state.index));};
+$('#achievement').addEventListener('cancel',e=>e.preventDefault());
 $('#how').onclick=()=>$('#rules').showModal();$('#help').onclick=()=>$('#rules').showModal();
 $('[data-close="rules"]').onclick=()=>$('#rules').close();
 $('#tutorial').onclick=()=>{onboarding=!state.tutorialDone;practice=beginTutorial(state,!onboarding);redraw();startGame();};$('#leavePractice').onclick=leavePractice;

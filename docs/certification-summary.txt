@@ -1,28 +1,13 @@
 {
+  "version": "3.1.0-rc.1",
   "certified": 100,
   "blockers": [],
-  "consecutiveRepeatedSolutions": [],
+  "duplicatedSolutionPatterns": [],
   "geometricDuplicates": [],
   "ratingBySize": [
-    {
-      "size": 4,
-      "min": 4,
-      "max": 43
-    },
-    {
-      "size": 5,
-      "min": 5,
-      "max": 44
-    },
-    {
-      "size": 6,
-      "min": 19,
-      "max": 64
-    },
-    {
-      "size": 7,
-      "min": 33,
-      "max": 91
-    }
+    {"size": 4, "min": 4, "max": 43},
+    {"size": 5, "min": 5, "max": 44},
+    {"size": 6, "min": 19, "max": 60},
+    {"size": 7, "min": 33, "max": 76}
   ]
 }

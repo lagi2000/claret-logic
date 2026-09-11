@@ -1,8 +1,8 @@
-# Claret Logic · 3.0.0 RC4
+# Claret Logic · 3.1.0 RC1
 
-Dos prácticas iniciales y **100 retos certificados de solución única**, según el ajuste aprobado por Luis. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución. Portada aprobada, reglas, vidas, ayudas, rangos y racha diaria conservados.
+Dos prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución. Portada, reglas, vidas, ayudas, rangos y racha diaria conservados.
 
-El certificado lógico estricto pasa: 100/100 retos con una solución, regiones conectadas y una traza de deducción sin adivinación. Las dos prácticas 4×4 son independientes, tienen solución única y aplican desde el inicio las tres reglas completas.
+El certificado lógico estricto pasa: 100/100 retos con una solución, regiones conectadas, traza de deducción sin adivinación y **100 disposiciones de respuesta distintas dentro de su tamaño**. Las dos prácticas 4×4 son independientes, tienen solución única y aplican desde el inicio las tres reglas completas.
 
 ## Probar y publicar
 
@@ -22,6 +22,7 @@ El certificado lógico estricto pasa: 100/100 retos con una solución, regiones 
 | dist/js/state.js | Vidas, progreso, rachas, prácticas y migración |
 | dist/js/feedback.js | Sonido opcional, vibración e hitos |
 | dist/js/app.js | Interfaz, teclado, diálogos y coordinación |
+| dist/js/worlds.js | Diez escenarios, rangos y recorrido por bloques |
 | dist/js/levels.js | Cien puzzles certificados |
 | dist/js/tutorials.js | Dos prácticas 4×4, completas y sin puntuación |
 | scripts/solver.mjs | Solver exhaustivo independiente |

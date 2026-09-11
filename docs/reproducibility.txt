@@ -1,6 +1,6 @@
-4×4: 16 candidatos certificados, 2 seleccionados
-5×5: 112 candidatos certificados, 14 seleccionados
-6×6: 240 candidatos certificados, 30 seleccionados
-7×7: 416 candidatos certificados, 54 seleccionados
+4×4: 16 candidatos certificados, 2 soluciones distintas seleccionadas
+5×5: 116 candidatos certificados, 14 soluciones distintas seleccionadas
+6×6: 264 candidatos certificados, 30 soluciones distintas seleccionadas
+7×7: 456 candidatos certificados, 54 soluciones distintas seleccionadas
 
-SHA256 reproducible: fd7065ceac9190bd0beaa686aeecfaf4bd59fb140d6f9d5b8c1c489445442c3b
+SHA256 reproducible: 3562c1ddfc841b0badaf67e0b0693ed98f6aa3b0c28f8540c14ac73cef511842

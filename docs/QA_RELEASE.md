@@ -1,12 +1,12 @@
-# QA · Claret Logic RC2
+# QA · Claret Logic 3.1.0 RC1
 
 ## Estado
 
-Decisión de producto aprobada y aplicada. Certificación lógica: **100/100**, sin bloqueos. Release candidate entregada para alojamiento estático. No desplegada en la web del colegio.
+Decisión de producto aprobada y aplicada. Certificación lógica: **100/100**, sin bloqueos. Release candidate preparada para GitHub Pages y alojamiento estático del colegio.
 
 ## Pruebas automáticas
 
-**131 pruebas superadas, cero fallos.** Registro completo en test-results.txt. Cobertura:
+**136 pruebas superadas, cero fallos.** Registro resumido en test-results.txt. Cobertura:
 
 - Unicidad independiente, conectividad y coherencia de referencia de los 100 retos.
 - Todas las deducciones de las trazas, sin recurrir a la clave de respuesta.
@@ -18,6 +18,10 @@ Decisión de producto aprobada y aplicada. Certificación lógica: **100/100**, 
 - Racha diaria, límites, cambios de mes/año y mejor marca.
 - Guardado bloqueado/corrupto y valores inválidos.
 - Manifest y service worker: precarga, respuestas cacheadas sin red, aislamiento por subcarpeta y exclusión de peticiones ajenas, probados en entorno simulado.
+- Diez mundos, rangos y bloques aprobados; ruta de diez nodos, colección de insignias y celebraciones accesibles.
+- Existencia y peso web de los diez escenarios; el escenario final también se verifica en la caché offline.
+- Cien disposiciones de solución distintas dentro de cada tamaño; cero duplicados geométricos.
+- Recuperación de la navegación si se recarga justo después de completar un reto o un bloque de diez.
 
 ## Navegador real, Chrome
 

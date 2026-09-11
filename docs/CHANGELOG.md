@@ -1,3 +1,12 @@
+# 3.1.0 RC1
+
+- Incorporado un recorrido visual de diez mundos: Sallent, Vic, Cuba, Madrid, Las Palmas de Gran Canaria, Don Benito, Sevilla, Carvalhos, Zimbabue y Fátima.
+- Cada mundo reúne diez retos, conserva el rango aprobado y ofrece un escenario ilustrado propio, una ruta numerada y estados de progreso inequívocos.
+- Añadidas celebraciones de rango al superar cada bloque de diez y una colección acumulativa de diez insignias; el reto 100 mantiene un cierre especial de Mente Claret.
+- Regenerada y recertificada la campaña: 100/100 soluciones únicas, regiones conectadas, deducción sin adivinación, cero duplicados geométricos y cero disposiciones de solución repetidas dentro de un mismo tamaño.
+- Recuperación robusta tras recargar justo al completar un reto o un bloque de diez.
+- Los diez escenarios y toda la aplicación quedan incluidos en la caché PWA para jugar tras una instalación correcta.
+
 # 3.0.0 RC4
 
 - Añadido a la portada el crédito «Creado por: Luis A. García · Claret Sevilla».

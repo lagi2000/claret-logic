@@ -10,6 +10,22 @@
 <body>
 <a class="skip" href="#board">Ir al tablero</a>
 <p id="storageWarning" class="warning" hidden>No se puede guardar en este navegador. Mantén esta página abierta para conservar la partida.</p>
+<section id="worldMap" class="worldmap" aria-labelledby="worldTitle" hidden inert>
+  <header class="mapbar">
+    <button id="mapHome" class="mapicon" aria-label="Volver a la portada">‹</button>
+    <div class="mapbrand"><img src="./assets/claret.jpeg" alt="" width="38" height="38"><strong>CLARET LOGIC</strong></div>
+    <button id="badges" class="mapicon badges-button" aria-label="Ver colección de insignias">✦</button>
+  </header>
+  <article id="worldScene" class="worldscene">
+    <img id="worldArt" src="./assets/worlds/01-sallent.webp" alt="" width="800" height="1422">
+    <div class="worldshade" aria-hidden="true"></div>
+    <header class="worldheading"><span id="worldNumber">MUNDO 1 DE 10</span><h1 id="worldTitle">Sallent</h1><p><b id="worldRange">Retos 1–10</b> · Rango <b id="worldRank">Explorador</b></p></header>
+    <svg class="route-line" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polyline id="routeLine" points="20,88 52,82 76,73 48,65 22,57 38,48 70,41 58,31 28,23 52,14"/></svg>
+    <div id="levelNodes" class="levelnodes" aria-label="Retos de este mundo"></div>
+    <p id="worldDescription" class="worlddescription">El origen: la Casa Natal, el telar familiar y el paisaje del Bages.</p>
+  </article>
+  <nav class="worldnav" aria-label="Cambiar de mundo"><button id="previousWorld" class="secondary">Anterior</button><span id="worldDots" aria-hidden="true"></span><button id="nextWorld" class="secondary">Siguiente</button></nav>
+</section>
 <main id="game" class="app" hidden inert>
 <header class="topbar"><a href="#" id="home" class="brand" aria-label="Volver a la portada"><img src="./assets/claret.jpeg" alt="" width="48" height="48"><span><small>PIENSA · COLOCA · AVANZA</small><strong>CLARET LOGIC</strong></span></a><nav aria-label="Opciones"><button id="sound" class="icon" aria-label="Desactivar sonido" aria-pressed="true">♪</button><button id="help" class="icon" aria-label="Cómo jugar">?</button></nav></header>
 <div class="arena"><aside class="hud"><section class="gamehead" aria-label="Progreso"><div><span class="eyebrow" id="difficulty">TUTORIAL</span><h1><span id="levelLabel">Reto</span> <span id="level">1</span><span class="total" id="levelTotal"> / 100</span></h1></div><div class="rank"><span class="eyebrow">TU RANGO</span><strong id="rank">Primeros pasos</strong></div></section>
@@ -28,6 +44,8 @@
 </section>
 <dialog id="rules" aria-labelledby="rulesTitle"><div class="dialoghead"><h2 id="rulesTitle">Cómo jugar</h2><button class="close" data-close="rules" aria-label="Cerrar reglas">×</button></div><p class="intro">Piensa una posición. Coloca a Claret. Revisa lo que implica.</p><ol class="rulelist"><li><strong>Uno por región.</strong> Cada zona de color y número necesita un Claret.</li><li><strong>Uno por fila y columna.</strong> No pueden compartirlas.</li><li><strong>Sin tocarse.</strong> También en diagonal.</li></ol><p>Antes de los 100 retos tienes dos prácticas para aprender las reglas por partes.</p><details><summary>Marcas y comprobación</summary><p>Elige Claret o Descartar y toca una casilla. Puedes corregir sin perder vidas. Las cruces automáticas solo aparecen en las dos prácticas para ayudarte a comprender las consecuencias. Desde el reto 1, todos los descartes los colocas tú.</p><p>Comprobar señala una regla incumplida y las casillas implicadas. No te dice qué Claret mover.</p></details><details><summary>Vidas, ayudas y rachas</summary><p>Tienes 3 vidas por reto. Reiniciar el tablero gasta una; al agotarlas, continúas en ese mismo reto con 3 vidas. Conservas tu progreso.</p><p>Las ayudas te orientan, acotan el razonamiento y realizan un único paso. Acumulas hasta 3. Cada 15 retos sin ayuda o 7 días seguidos encendiendo el corazón de María puedes recuperar una.</p></details><details><summary>Teclado y guardado</summary><p>Usa Tab para elegir una herramienta o entrar al tablero, las flechas para recorrerlo y Espacio o Intro para marcar. Escape cierra esta ventana.</p><p>El progreso solo se guarda en este navegador. No se sincroniza entre dispositivos. Borrar los datos del navegador también borra la partida.</p></details></dialog>
 <dialog id="daily" class="daily" aria-labelledby="dailyTitle"><span class="eyebrow">UN NUEVO DÍA, UN NUEVO RETO</span><h2 id="dailyTitle">Racha diaria</h2><p>Toca el corazón de María<br>y enciende la racha.</p><button id="heart" class="heart" aria-label="Tocar el corazón de María y encender la racha"><span class="maria-art" aria-hidden="true"><img src="./assets/maria-reference.png" alt="" width="941" height="1672"></span></button><div class="dailycount"><strong id="dailyCount">0</strong><span>Racha actual · días seguidos</span></div><p id="dailyBest">Mejor racha: 0</p><div id="week" class="week" aria-label="Actividad de esta semana"></div><p id="dailyMessage" role="status">Un pequeño gesto para comenzar.</p><button id="dailyContinue" class="primary" disabled>Continuar</button></dialog>
+<dialog id="achievement" class="achievement" aria-labelledby="achievementTitle"><span class="eyebrow">¡NUEVO RANGO DESBLOQUEADO!</span><div id="achievementBadge" class="bigbadge" aria-hidden="true">✦</div><h2 id="achievementTitle">Explorador</h2><p id="achievementCopy">Has superado 10 nuevos retos.</p><button id="achievementContinue" class="primary">Continuar el viaje</button></dialog>
+<dialog id="collection" class="collection" aria-labelledby="collectionTitle"><div class="dialoghead"><div><span class="eyebrow">TU RECORRIDO</span><h2 id="collectionTitle">Colección de insignias</h2></div><button class="close" data-close="collection" aria-label="Cerrar colección">×</button></div><div id="badgeGrid" class="badgegrid"></div></dialog>
 <noscript>Claret Logic necesita JavaScript activado para jugar.</noscript>
 <script type="module" src="./js/app.js"></script>
 </body></html>
