@@ -6,6 +6,7 @@ import {KEY,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,c
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
 import {fittedBoardSize} from './layout.js';
+import {journeyStatus} from './journey.js';
 const $=s=>document.querySelector(s), board=$('#board');
 let storage;try{storage=window.localStorage;}catch{}
 const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null;
@@ -104,7 +105,13 @@ function check(){
     if(milestone){pendingAchievement=worldIndexForLevel(s.index);setTimeout(openAchievement,450);}
   }else{drawBoard();message(result.message,'error');play('error',state.sound);}
 }
-function startGame(){ if(!practice&&!state.tutorialDone){practice=beginTutorial(state);onboarding=true;redraw();} $('#start').hidden=true;$('#worldMap').hidden=true;$('#worldMap').inert=true;$('#game').hidden=false;$('#game').inert=false;stats();$('#toolClaret').focus();if(state.daily.last<dateKey())openDaily(); }
+function startGame(){
+  if(!practice&&!state.tutorialDone){practice=beginTutorial(state);onboarding=true;}
+  $('#start').hidden=true;$('#worldMap').hidden=true;$('#worldMap').inert=true;$('#game').hidden=false;$('#game').inert=false;
+  // The map changes state.index without keeping a game screen mounted. Always
+  // rebuild here so the selected node cannot reuse the previous board's DOM.
+  redraw();$('#toolClaret').focus();if(state.daily.last<dateKey())openDaily();
+}
 function home(){persist();practice=null;onboarding=false;$('#start').hidden=false;$('#worldMap').hidden=true;$('#worldMap').inert=true;$('#game').hidden=true;$('#game').inert=true;redraw();$('#play').focus();}
 function leavePractice(){practice=null;onboarding=false;redraw();openMap();}
 function renderDaily(){
@@ -118,7 +125,7 @@ function openDaily(){renderDaily();$('#daily').showModal();}
 function drawMap(){
   const W=worlds[mapWorld],unlocked=unlockedWorldIndex(state),start=mapWorld*10;
   $('#worldScene').style.setProperty('--world-tone',W.tone);$('#worldArt').src=`./assets/worlds/${W.art}`;$('#worldArt').alt=`Escenario de ${W.place}`;
-  $('#worldNumber').textContent=`MUNDO ${mapWorld+1} DE 10`;$('#worldTitle').textContent=W.place;$('#worldRange').textContent=W.range;$('#worldRank').textContent=W.rank;$('#worldDescription').textContent=W.description;
+  $('#worldNumber').textContent=`MUNDO ${mapWorld+1} DE 10`;$('#worldTitle').textContent=W.place;$('#worldRange').textContent=W.range;$('#worldRankLabel').textContent=state.completed>=(mapWorld+1)*10?'Rango':'Meta';$('#worldRank').textContent=W.rank;$('#worldDescription').textContent=W.description;
   $('#routeLine').setAttribute('points',routePoints.map(p=>p.join(',')).join(' '));
   const nodes=$('#levelNodes');nodes.replaceChildren();
   routePoints.forEach(([x,y],i)=>{
@@ -134,10 +141,11 @@ function drawMap(){
 function openMap(index=worldIndexForLevel(state.completed>=100?99:state.index)){
   // A solved round can survive a refresh. Resume the journey without leaving
   // the player on a map where every visible node is disabled.
-  if(state.round.solved&&state.completed===state.index+1&&(state.index+1)%10!==0&&state.index<99){nextLevel(state);index=worldIndexForLevel(state.index);}
+  const journey=journeyStatus(state);
+  if(journey.kind==='advance'){nextLevel(state);index=worldIndexForLevel(state.index);}
   persist();practice=null;onboarding=false;mapWorld=Math.min(unlockedWorldIndex(state),Math.max(0,index));
   $('#start').hidden=true;$('#game').hidden=true;$('#game').inert=true;$('#worldMap').hidden=false;$('#worldMap').inert=false;drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});
-  if(state.round.solved&&state.completed===state.index+1&&(state.index+1)%10===0){pendingAchievement=worldIndexForLevel(state.index);setTimeout(openAchievement,120);}
+  if(journey.kind==='achievement'){pendingAchievement=journey.world;setTimeout(openAchievement,120);}
 }
 function renderCollection(){
   const grid=$('#badgeGrid');grid.replaceChildren();
@@ -198,11 +206,12 @@ function scheduleFit(){cancelAnimationFrame(fitFrame);fitFrame=requestAnimationF
  const app=$('#game');if(app.hidden)return;
  if(matchMedia('(min-width:560px) and (max-height:520px)').matches){board.style.removeProperty('width');return;}
  const viewport=window.visualViewport?.height??window.innerHeight;
- const square=board.getBoundingClientRect(),top=$('.topbar').getBoundingClientRect(),footer=$('#game footer').getBoundingClientRect();
+ const square=board.getBoundingClientRect(),top=$('.topbar').getBoundingClientRect();
+ const visibleBottoms=[$('.arena'),$('#game footer')].map(el=>el.getBoundingClientRect()).filter(rect=>rect.height>0).map(rect=>rect.bottom);
  // Measure the real content span. Using app.height is incorrect because the
  // mobile layout deliberately has min-height:100svh and caused the board to
  // shrink a few pixels on every ResizeObserver pass.
- const contentHeight=Math.max(0,footer.bottom-top.top);
+ const contentHeight=Math.max(0,Math.max(top.bottom,...visibleBottoms)-top.top);
  const playStyle=getComputedStyle($('.play'));
  const maxWidth=$('.play').clientWidth-parseFloat(playStyle.paddingLeft)-parseFloat(playStyle.paddingRight);
  const size=fittedBoardSize({viewport,contentHeight,boardSize:square.height,maxWidth,air:20});

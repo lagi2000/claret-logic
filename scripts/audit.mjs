@@ -1,8 +1,13 @@
 import fs from 'node:fs';
+import {levels} from '../dist/js/levels.js';
+import {tutorials} from '../dist/js/tutorials.js';
 import {solve} from './solver.mjs';
 import {connectedRegions,diagnose} from '../dist/js/engine.js';
 import {deductions} from '../dist/js/pedagogy.js';
-const levels=JSON.parse(fs.readFileSync(new URL('../docs/original-levels.json',import.meta.url)));
-const rows=levels.map(L=>{const s=solve(L,100),p=deductions(L);return {level:L.n,size:L.size,solutions:s.count,capped:s.capped,connected:connectedRegions(L),referenceValid:diagnose(L,Object.fromEntries(L.solution.map((c,r)=>[r*L.size+c,'c']))).ok,pedagogical:p.solved,rating:p.rating};});
-fs.writeFileSync(new URL('../docs/audit-original.json',import.meta.url),JSON.stringify(rows,null,2));
-console.log(JSON.stringify({levels:rows.length,multiple:rows.filter(r=>r.solutions!==1),disconnected:rows.filter(r=>!r.connected).map(r=>r.level),invalidReference:rows.filter(r=>!r.referenceValid).map(r=>r.level),notDeducible:rows.filter(r=>!r.pedagogical).map(r=>r.level),sizes:[...new Set(rows.map(r=>r.size))]},null,2));
+const inspect=(L,kind)=>{const s=solve(L,100),p=deductions(L);return {kind,level:L.n,size:L.size,solutions:s.count,capped:s.capped,connected:connectedRegions(L),referenceValid:diagnose(L,Object.fromEntries(L.solution.map((c,r)=>[r*L.size+c,'c']))).ok,pedagogical:p.solved,rating:p.rating};};
+const rows=[...tutorials.map(L=>inspect(L,'práctica')),...levels.map(L=>inspect(L,'reto'))];
+const issues=rows.filter(r=>r.solutions!==1||!r.connected||!r.referenceValid||!r.pedagogical);
+const report={audited:rows.length,tutorials:tutorials.length,levels:levels.length,passed:rows.length-issues.length,issues,sizes:[...new Set(rows.map(r=>r.size))],rows};
+fs.writeFileSync(new URL('../docs/audit-current.json',import.meta.url),JSON.stringify(report,null,2));
+console.log(JSON.stringify({...report,rows:undefined},null,2));
+if(issues.length)process.exitCode=1;

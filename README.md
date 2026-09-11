@@ -1,4 +1,4 @@
-# Claret Logic · 3.1.0 RC1
+# Claret Logic · 3.1.0 RC2
 
 Dos prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución. Portada, reglas, vidas, ayudas, rangos y racha diaria conservados.
 
@@ -22,6 +22,7 @@ El certificado lógico estricto pasa: 100/100 retos con una solución, regiones 
 | dist/js/state.js | Vidas, progreso, rachas, prácticas y migración |
 | dist/js/feedback.js | Sonido opcional, vibración e hitos |
 | dist/js/app.js | Interfaz, teclado, diálogos y coordinación |
+| dist/js/journey.js | Transiciones verificables entre reto, mapa e hitos |
 | dist/js/worlds.js | Diez escenarios, rangos y recorrido por bloques |
 | dist/js/levels.js | Cien puzzles certificados |
 | dist/js/tutorials.js | Dos prácticas 4×4, completas y sin puntuación |
@@ -38,7 +39,8 @@ El certificado lógico estricto pasa: 100/100 retos con una solución, regiones 
 2. `npm run build`
 3. `npm test`
 4. `npm run certify`
+5. `npm run audit`
 
-Todos deben terminar con código 0. `npm run audit` revisa el MVP original conservado en docs/original-levels.json; es información histórica y no un bloqueo de la versión actual.
+Todos deben terminar con código 0. `npm run audit` revisa las 102 cuadrículas publicadas; el diagnóstico histórico del MVP se conserva aparte en docs/audit-original.json.
 
 La dificultad es una estimación por longitud y complejidad de las deducciones; se aconseja observar su recepción en el aula. No se recopilan datos de los jugadores.
