@@ -5,6 +5,7 @@ import {nextHint} from './pedagogy.js';
 import {KEY,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
+import {fittedBoardSize} from './layout.js';
 const $=s=>document.querySelector(s), board=$('#board');
 let storage;try{storage=window.localStorage;}catch{}
 const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null;
@@ -197,11 +198,14 @@ function scheduleFit(){cancelAnimationFrame(fitFrame);fitFrame=requestAnimationF
  const app=$('#game');if(app.hidden)return;
  if(matchMedia('(min-width:560px) and (max-height:520px)').matches){board.style.removeProperty('width');return;}
  const viewport=window.visualViewport?.height??window.innerHeight;
- const rect=app.getBoundingClientRect(),square=board.getBoundingClientRect();
- const available=viewport-(rect.height-square.height)-Math.max(0,rect.top)-8;
+ const square=board.getBoundingClientRect(),top=$('.topbar').getBoundingClientRect(),footer=$('#game footer').getBoundingClientRect();
+ // Measure the real content span. Using app.height is incorrect because the
+ // mobile layout deliberately has min-height:100svh and caused the board to
+ // shrink a few pixels on every ResizeObserver pass.
+ const contentHeight=Math.max(0,footer.bottom-top.top);
  const playStyle=getComputedStyle($('.play'));
  const maxWidth=$('.play').clientWidth-parseFloat(playStyle.paddingLeft)-parseFloat(playStyle.paddingRight);
- const size=Math.floor(Math.max(168,Math.min(maxWidth,available)));
+ const size=fittedBoardSize({viewport,contentHeight,boardSize:square.height,maxWidth,air:20});
  if(Math.abs(square.width-size)>1)board.style.width=size+'px';
  });}
 new ResizeObserver(scheduleFit).observe($('#game'));

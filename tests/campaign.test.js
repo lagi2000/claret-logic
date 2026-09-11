@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {access,readFile,stat} from 'node:fs/promises';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from '../dist/js/worlds.js';
+import {fittedBoardSize} from '../dist/js/layout.js';
 
 const expected=[
   ['Sallent','Retos 1–10','Explorador'],
@@ -51,4 +52,10 @@ test('La interfaz incluye recorrido, colección y celebración de rango accesibl
   assert.match(html,/aria-labelledby="worldTitle"/);
   assert.match(html,/aria-labelledby="achievementTitle"/);
   assert.match(html,/aria-labelledby="collectionTitle"/);
+});
+
+test('El tablero aprovecha el ancho sin crecer fuera de la altura visible',()=>{
+  assert.equal(fittedBoardSize({viewport:700,contentHeight:520,boardSize:170,maxWidth:345}),330);
+  assert.equal(fittedBoardSize({viewport:844,contentHeight:650,boardSize:320,maxWidth:345}),345);
+  assert.equal(fittedBoardSize({viewport:480,contentHeight:600,boardSize:220,maxWidth:300}),168);
 });

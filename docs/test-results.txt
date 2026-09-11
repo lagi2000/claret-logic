@@ -1,6 +1,6 @@
 Claret Logic 3.1.0 RC1
 
-Resultado final reproducible: 136 pruebas, 136 superadas, 0 fallos.
+Resultado final reproducible: 137 pruebas, 137 superadas, 0 fallos.
 
 Cobertura destacada:
 - 100 retos: solución única, regiones conectadas, referencia correcta y resolución deductiva sin adivinación.
@@ -9,6 +9,7 @@ Cobertura destacada:
 - Vidas, ayudas, recompensas, racha diaria, rangos, migraciones y recuperación de datos.
 - Diez mundos, orden histórico aprobado, bloques y rangos correctos, diez artes optimizados y ruta válida.
 - Recorrido, colección y diálogo de logro con nombres accesibles.
+- Cálculo estable del tamaño del tablero: aprovecha el ancho sin superar la altura disponible.
 - Manifest, rutas relativas, caché PWA y escenario final disponible sin red después de instalar.
 
 Comandos:

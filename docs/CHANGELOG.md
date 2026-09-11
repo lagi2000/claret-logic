@@ -1,5 +1,7 @@
 # 3.1.0 RC1
 
+- Corregido el cálculo responsive que reducía progresivamente el tablero en algunos iPhone; ahora prioriza el ancho útil y mide solo la altura real del contenido.
+- En teléfonos de poca altura se ocultan dos textos redundantes para ampliar el área táctil del tablero sin introducir scroll.
 - Incorporado un recorrido visual de diez mundos: Sallent, Vic, Cuba, Madrid, Las Palmas de Gran Canaria, Don Benito, Sevilla, Carvalhos, Zimbabue y Fátima.
 - Cada mundo reúne diez retos, conserva el rango aprobado y ofrece un escenario ilustrado propio, una ruta numerada y estados de progreso inequívocos.
 - Añadidas celebraciones de rango al superar cada bloque de diez y una colección acumulativa de diez insignias; el reto 100 mantiene un cierre especial de Mente Claret.

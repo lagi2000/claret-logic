@@ -6,7 +6,7 @@ Decisión de producto aprobada y aplicada. Certificación lógica: **100/100**, 
 
 ## Pruebas automáticas
 
-**136 pruebas superadas, cero fallos.** Registro resumido en test-results.txt. Cobertura:
+**137 pruebas superadas, cero fallos.** Registro resumido en test-results.txt. Cobertura:
 
 - Unicidad independiente, conectividad y coherencia de referencia de los 100 retos.
 - Todas las deducciones de las trazas, sin recurrir a la clave de respuesta.

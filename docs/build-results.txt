@@ -1,1 +1,1 @@
-Build validado: 26 archivos de producción; los 10 escenarios y worlds.js están incluidos en la caché PWA.
+Build validado: 27 archivos de producción; los 10 escenarios, worlds.js y layout.js están incluidos en la caché PWA.
