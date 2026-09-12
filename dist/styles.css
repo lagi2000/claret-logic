@@ -106,3 +106,31 @@ dialog:not([open]){display:none!important}
  .app footer,.boardfoot{display:none}.app{padding-top:max(8px,env(safe-area-inset-top));padding-bottom:max(8px,env(safe-area-inset-bottom))}
  .topbar{padding-bottom:5px}.arena{margin-top:6px}.status{margin-top:4px;margin-bottom:6px}
 }
+
+/* RC2 visual clarity: colour and boundaries carry the puzzle; region numbers
+   remain available in each cell's accessible name without covering the art. */
+.play{position:relative}.cell{border-color:#17385c18}.cell.fixed{box-shadow:inset 0 0 0 4px #ffd34f,inset 0 0 18px #fff3a8}.daily-button{color:#bc0759}.daily-button.due{animation:dailyPulse 1.8s ease-in-out infinite}.startlinks .daily-button.due{background:#fff2a622;color:#ffe599}
+@keyframes dailyPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08);filter:drop-shadow(0 0 7px #ff8bb8)}}
+
+/* A placed Claret briefly reveals the three rules it affects, never a solution. */
+.cell.rule-effect{animation:ruleEffect .68s ease-out}.cell.rule-origin{z-index:4;animation:ruleOrigin .68s ease-out}
+@keyframes ruleEffect{0%{filter:brightness(1);box-shadow:inset 0 0 0 0 #fff}35%{filter:brightness(1.17);box-shadow:inset 0 0 0 3px #fff9}100%{filter:brightness(1);box-shadow:inset 0 0 0 0 #fff0}}
+@keyframes ruleOrigin{0%{filter:brightness(1)}35%{filter:brightness(1.2);box-shadow:inset 0 0 0 5px #ffe66f,0 0 22px #ffd64a}100%{filter:brightness(1);box-shadow:none}}
+
+/* Claret reacts without taking space away from the board. */
+.claret-reaction{position:absolute;z-index:12;right:12px;top:10px;display:flex;align-items:center;gap:7px;max-width:min(250px,72%);padding:5px 9px 5px 5px;border:2px solid white;border-radius:999px;background:#17385eee;color:white;box-shadow:0 7px 18px #071a3060;pointer-events:none;animation:reactionIn .2s ease-out}.claret-reaction img{width:38px;height:38px;object-fit:cover;object-position:center 18%;border-radius:50%;border:2px solid #ffe48f}.claret-reaction span{font-size:.75rem;font-weight:900;line-height:1.15}.claret-reaction.worry{background:#8f2452ee}.claret-reaction.spark,.claret-reaction.win{background:#08794fee}.claret-reaction.worry img{animation:reactionShake .32s ease}.claret-reaction.spark img,.claret-reaction.win img{animation:reactionBounce .5s ease}
+@keyframes reactionIn{from{opacity:0;transform:translateY(-8px) scale(.94)}to{opacity:1;transform:none}}@keyframes reactionShake{25%{transform:rotate(-5deg)}75%{transform:rotate(5deg)}}@keyframes reactionBounce{45%{transform:translateY(-5px) scale(1.08)}}
+
+/* Mission cards announce a change of rhythm before the board starts. */
+.mission-intro{width:min(430px,calc(100% - 24px));padding:26px;text-align:center;color:#17385c;border:2px solid #8dbfeb;background:radial-gradient(circle at 50% 10%,#fff7c9,#fff 48%,#edf6ff);box-shadow:0 20px 70px #06192b90}.mission-intro::backdrop{background:#06192bd9;backdrop-filter:blur(5px)}.mission-intro .eyebrow{color:#a25300;letter-spacing:.12em}.mission-intro .mission-symbol{display:grid;place-items:center;width:94px;height:94px;margin:18px auto;border-radius:50%;border:5px solid white;background:linear-gradient(145deg,#ed257f,#a9004a);color:white;font-size:2.8rem;font-weight:950;box-shadow:0 0 0 5px #ffd766,0 12px 28px #17385c35;animation:missionSymbol .65s cubic-bezier(.2,.9,.25,1.25)}.mission-intro h2{font-size:clamp(1.7rem,7vw,2.35rem);line-height:1.08}.mission-intro p{color:#4d647b}.mission-intro .primary{width:100%;min-height:50px}.mission-intro[data-mission=logical] .mission-symbol{background:linear-gradient(145deg,#318ae0,#145fa9)}.mission-intro[data-mission=intruder] .mission-symbol{background:linear-gradient(145deg,#f29a31,#a84200)}.mission-intro[data-mission=boss] .mission-symbol{background:linear-gradient(145deg,#ffc83e,#996000)}
+@keyframes missionSymbol{from{opacity:0;transform:scale(.45) rotate(-12deg)}to{opacity:1;transform:none}}
+
+/* Progress feels continuous: the solved board recedes and the route arrives. */
+.level-exit .play{animation:levelExit .32s ease-in forwards}.map-enter .worldscene{animation:mapEnter .5s cubic-bezier(.2,.8,.2,1)}.map-enter .levelnode.current{animation:activeNode 1.8s ease-in-out infinite,nodeArrive .52s cubic-bezier(.2,.9,.25,1.3)}
+@keyframes levelExit{to{opacity:0;transform:scale(.94) translateY(-10px)}}@keyframes mapEnter{from{opacity:0;transform:scale(.97) translateY(12px)}to{opacity:1;transform:none}}@keyframes nodeArrive{from{transform:translate(-50%,-50%) scale(.35)}to{transform:translate(-50%,-50%) scale(1)}}
+
+/* Seven low-cost particles give every real-world stage a distinct atmosphere. */
+.worldambience{position:absolute;z-index:2;inset:0;overflow:hidden;pointer-events:none}.worldambience span{--x:50%;--delay:0s;--duration:9s;position:absolute;left:var(--x);bottom:-8%;color:#fff6c4;font:900 18px/1 system-ui;text-shadow:0 2px 5px #071a3090;opacity:0;animation:worldFloat var(--duration) linear var(--delay) infinite}.worldambience[data-world="2"] span,.worldambience[data-world="4"] span{color:#bdf4ff}.worldambience[data-world="5"] span,.worldambience[data-world="7"] span{color:#d9ffc8}.worldambience[data-world="8"] span{color:#ffcf86}.worldambience[data-world="9"] span{color:#fff7c2}
+@keyframes worldFloat{0%{opacity:0;transform:translateY(0) rotate(0)}15%,75%{opacity:.35}100%{opacity:0;transform:translateY(-105svh) rotate(130deg)}}
+@media(max-width:420px){.mapactions{gap:3px}.mapactions .mapicon{width:38px;min-height:38px}.claret-reaction{right:7px;top:6px}.mission-intro{padding:20px}.mission-intro .mission-symbol{width:78px;height:78px;font-size:2.25rem}}
+@media(prefers-reduced-motion:reduce){.daily-button.due,.cell.rule-effect,.cell.rule-origin,.claret-reaction,.claret-reaction img,.mission-intro .mission-symbol,.level-exit .play,.map-enter .worldscene,.map-enter .levelnode.current,.worldambience span{animation:none!important}}

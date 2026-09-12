@@ -46,13 +46,21 @@ test('El nivel y el progreso abren exactamente el mundo correspondiente',()=>{
   assert.equal(unlockedWorldIndex({index:99,completed:100}),9);
 });
 
-test('La interfaz incluye recorrido completo, colección y celebración de rango accesibles',async()=>{
+test('La interfaz incluye recorrido, racha, misiones y celebración accesibles',async()=>{
   const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
-  for(const id of ['worldMap','worldScene','levelNodes','achievement','collection','badgeGrid','journeyButton','journeyOverview','journeyList','journeyCurrent'])assert.match(html,new RegExp(`id="${id}"`));
+  for(const id of ['worldMap','worldScene','worldAmbience','levelNodes','achievement','collection','badgeGrid','journeyButton','journeyOverview','journeyList','journeyCurrent','startDaily','mapDaily','gameDaily','daily','missionIntro','claretReaction'])assert.match(html,new RegExp(`id="${id}"`));
   assert.match(html,/aria-labelledby="worldTitle"/);
   assert.match(html,/aria-labelledby="achievementTitle"/);
   assert.match(html,/aria-labelledby="collectionTitle"/);
   assert.match(html,/aria-labelledby="journeyTitle"/);
+  assert.match(html,/aria-labelledby="missionIntroTitle"/);
+});
+
+test('La cuadrícula no dibuja números de región y limita el distintivo a la guía',async()=>{
+  const app=await readFile(new URL('../dist/js/app.js',import.meta.url),'utf8');
+  assert.doesNotMatch(app,/className='regionid'/);
+  assert.match(app,/classList\.toggle\('fixed',Boolean\(mission\?\.fixed\?\.includes\(k\)\)\)/);
+  assert.match(app,/pulseConsequences\(k,L\)/);
 });
 
 test('El tablero aprovecha el ancho sin crecer fuera de la altura visible',()=>{

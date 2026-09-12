@@ -1,6 +1,6 @@
-# Claret Logic · 3.2.0 RC1
+# Claret Logic · 3.2.0 RC2
 
-Dos prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Cada mundo combina seis retos clásicos con «Claret ya ha empezado», «La jugada lógica», «Detecta al intruso» y un gran reto final. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución. Portada, reglas, vidas, ayudas, rangos y racha diaria conservados.
+Dos prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Cada mundo combina seis retos clásicos con «Claret ya ha empezado», «La jugada lógica», «Detecta al intruso» y un gran reto final. La cuadrícula mantiene el protagonismo con límites de región limpios, reacciones de Claret y consecuencias visuales sin revelar soluciones. La racha diaria dispone de acceso permanente y apertura automática cuando está pendiente. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución.
 
 El certificado lógico estricto pasa: 100/100 retos con una solución, regiones conectadas, traza de deducción sin adivinación y **100 disposiciones de respuesta distintas dentro de su tamaño**. Las dos prácticas 4×4 son independientes, tienen solución única y aplican desde el inicio las tres reglas completas.
 
