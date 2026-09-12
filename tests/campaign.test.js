@@ -46,12 +46,13 @@ test('El nivel y el progreso abren exactamente el mundo correspondiente',()=>{
   assert.equal(unlockedWorldIndex({index:99,completed:100}),9);
 });
 
-test('La interfaz incluye recorrido, colección y celebración de rango accesibles',async()=>{
+test('La interfaz incluye recorrido completo, colección y celebración de rango accesibles',async()=>{
   const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
-  for(const id of ['worldMap','worldScene','levelNodes','achievement','collection','badgeGrid'])assert.match(html,new RegExp(`id="${id}"`));
+  for(const id of ['worldMap','worldScene','levelNodes','achievement','collection','badgeGrid','journeyButton','journeyOverview','journeyList','journeyCurrent'])assert.match(html,new RegExp(`id="${id}"`));
   assert.match(html,/aria-labelledby="worldTitle"/);
   assert.match(html,/aria-labelledby="achievementTitle"/);
   assert.match(html,/aria-labelledby="collectionTitle"/);
+  assert.match(html,/aria-labelledby="journeyTitle"/);
 });
 
 test('El tablero aprovecha el ancho sin crecer fuera de la altura visible',()=>{

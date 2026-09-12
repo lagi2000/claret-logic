@@ -7,6 +7,7 @@ import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
 import {fittedBoardSize} from './layout.js';
 import {journeyStatus,solvedActionLabel} from './journey.js';
+import {missionFor,seedMission,missionGate,missionProgress} from './missions.js';
 const $=s=>document.querySelector(s), board=$('#board');
 let storage;try{storage=window.localStorage;}catch{}
 const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null;
@@ -23,7 +24,11 @@ function stats(){
   $('#lives').textContent='♥ '.repeat(s.round.lives).trim();$('#lives').setAttribute('aria-label',`${s.round.lives} vidas`);
   $('#helps').textContent=state.helps;$('#streak').textContent=state.streak;$('#size').textContent=`${L.size} × ${L.size}`;
   $('#count').textContent=`${Object.values(s.round.marks).filter(v=>v==='c').length}/${L.size}`;
-  $('#tip').textContent=L.tip;
+  const mission=practice?null:missionFor(s.index,L);
+  $('#missionTag').hidden=!mission;$('#missionTag').textContent=mission?.title??'';
+  $('#tipText').textContent=mission?.copy??L.tip;
+  $('#missionProgress').hidden=!mission;$('#missionProgress').textContent=mission?missionProgress(mission,s.round.marks):'';
+  $('.play').dataset.mission=mission?.type??'classic';
   $('#boardNote').textContent=practice?'Al colocar a Claret verás las consecuencias de tu elección.':'Las cruces solo aparecen cuando tú las colocas.';
   const milestone=!practice&&s.round.solved&&(s.index+1)%10===0;
   $('#check').textContent=s.round.solved?solvedActionLabel({practice,index:s.index,onboarding,milestone}):'Comprobar';
@@ -34,7 +39,7 @@ function stats(){
   $('#resume').textContent=state.completed===100?'Has completado los 100 retos.':state.index?`Continúa en el reto ${state.index+1}.`:'100 retos. A tu ritmo.';
 }
 function drawBoard(){
-  const s=current(),L=level(),n=L.size,auto=practice?autoMarks(L,s.round.marks):new Set();
+  const s=current(),L=level(),n=L.size,mission=practice?null:missionFor(s.index,L),auto=practice?autoMarks(L,s.round.marks):new Set();
   board.replaceChildren();board.style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;board.style.gridTemplateRows=`repeat(${n},minmax(0,1fr))`;board.setAttribute('aria-label',`Tablero de ${n} filas y ${n} columnas`);
   for(let k=0;k<n*n;k++) {
     const r=Math.floor(k/n),c=k%n,region=L.regions[r][c],v=s.round.marks[k],isX=v!=='c'&&(v==='x'||auto.has(k));
@@ -42,8 +47,8 @@ function drawBoard(){
     b.style.backgroundColor=palette[region];
     if(r>0&&L.regions[r-1][c]!==region)b.style.borderTop='2px solid #17385c';
     if(c>0&&L.regions[r][c-1]!==region)b.style.borderLeft='2px solid #17385c';
-    b.classList.toggle('auto',isX&&v!=='x');b.classList.toggle('hi',highlights.includes(k));
-    b.setAttribute('aria-label',`Fila ${r+1}, columna ${c+1}, región ${region+1}: ${v==='c'?'Claret':isX?(v==='x'?'descarte manual':'descarte automático'):'vacía'}`);
+    b.classList.toggle('auto',isX&&v!=='x');b.classList.toggle('hi',highlights.includes(k));b.classList.toggle('fixed',mission?.fixed?.includes(k));
+    b.setAttribute('aria-label',`Fila ${r+1}, columna ${c+1}, región ${region+1}: ${v==='c'?(mission?.fixed?.includes(k)?'Claret guía':'Claret'):isX?(v==='x'?'descarte manual':'descarte automático'):'vacía'}`);
     b.setAttribute('aria-pressed',String(v==='c'));b.setAttribute('aria-disabled',String(s.round.solved));
     const id=document.createElement('span');id.className='regionid';id.textContent=region+1;id.setAttribute('aria-hidden','true');b.append(id);
     if(v==='c'){const img=document.createElement('img');img.src='./assets/claret.jpeg';img.alt='';b.append(img);}
@@ -55,16 +60,23 @@ function drawBoard(){
   }
   stats();
 }
-function redraw(){highlights=[];pendingHint=null;focusCell=0;$('#hintText').hidden=true;drawBoard();message(current().round.solved?'¡Reto superado! Puedes continuar.':'Elige una casilla para empezar.',current().round.solved?'success':'');}
+function redraw(){
+  const s=current();if(!practice)seedMission(s.index,level(),s.round);
+  highlights=[];pendingHint=null;focusCell=0;$('#hintText').hidden=true;drawBoard();
+  const mission=practice?null:missionFor(s.index,level());
+  message(s.round.solved?'¡Reto superado! Puedes continuar.':mission?.type==='intruder'?'Compara los dos Claret. Uno de ellos rompe una norma.':mission?.type==='logical'?'Busca primero una deducción completamente segura.':'Elige una casilla para empezar.',s.round.solved?'success':'');
+}
 function mark(k){
   const s=current();if(s.round.solved)return;
-  focusCell=k;const marks=s.round.marks,auto=practice?autoMarks(level(),marks):new Set();
+  focusCell=k;const marks=s.round.marks,L=level(),mission=practice?null:missionFor(s.index,L),gate=missionGate(mission,marks,tool,k),auto=practice?autoMarks(L,marks):new Set();
+  if(gate){highlights=mission?.type==='intruder'?[...mission.fixed,mission.intruder]:mission?.fixed??[];drawBoard();message(gate,'error');play('error',state.sound);return;}
   if(tool==='x'&&marks[k]==='c'){message('Selecciona Claret para retirar esa figura.');return;}
   if(tool==='x'&&auto.has(k)&&marks[k]!=='x'){message('Esta X depende de tu hipótesis. Retira el Claret que la provoca para revisarla.');return;}
   if(marks[k]===tool)delete marks[k];else marks[k]=tool;
   highlights=[];pendingHint=null;s.round.helpStep=0;$('#hintText').hidden=true;
   persist();drawBoard();const cell=board.querySelector(`[data-cell="${k}"]`);cell.focus({preventScroll:true});if(tool==='c'&&marks[k]==='c')cell.classList.add('selected');
-  message(tool==='c'?(practice?'Hipótesis actualizada. Revisa sus consecuencias.':'Claret colocado. Ahora decide tus descartes.'):'Descarte actualizado.');play(tool==='c'?'place':'x',state.sound);haptic();
+  const missionMoment=mission?.type==='intruder'&&k===mission.intruder&&!marks[k]?'¡Intruso localizado! Ahora completa el tablero.':mission?.type==='logical'&&k===mission.target&&marks[k]===mission.expected?'¡Primera deducción conseguida! Continúa con el tablero.':'';
+  message(missionMoment|| (tool==='c'?(practice?'Hipótesis actualizada. Revisa sus consecuencias.':'Claret colocado. Ahora decide tus descartes.'):'Descarte actualizado.'),missionMoment?'success':'');play(tool==='c'?'place':'x',state.sound);haptic();
 }
 function setTool(value){tool=value;$('#toolClaret').setAttribute('aria-pressed',String(value==='c'));$('#toolX').setAttribute('aria-pressed',String(value==='x'));}
 function showHint(){
@@ -130,9 +142,11 @@ function drawMap(){
   const nodes=$('#levelNodes');nodes.replaceChildren();
   routePoints.forEach(([x,y],i)=>{
     const number=start+i+1,done=number<=state.completed,current=number===state.index+1&&state.completed<100,available=mapWorld<=unlocked&&(done||current);
-    const b=document.createElement('button');b.type='button';b.className='levelnode';b.style.left=x+'%';b.style.top=y+'%';b.textContent=done?'✓':number;b.dataset.level=number;
+    const mission=missionFor(number-1,levels[number-1]),b=document.createElement('button');b.type='button';b.className='levelnode';b.style.left=x+'%';b.style.top=y+'%';b.textContent=done?'✓':number;b.dataset.level=number;
     b.classList.toggle('done',done);b.classList.toggle('current',current);b.classList.toggle('locked',!available);b.disabled=!current;
-    b.setAttribute('aria-label',done?`Reto ${number}, superado`:current?`Reto ${number}, continuar`: `Reto ${number}, bloqueado`);
+    if(mission){b.classList.add('mission-node');b.dataset.mission=mission.symbol;}
+    const missionName=mission?`, misión ${mission.short}`:'';
+    b.setAttribute('aria-label',done?`Reto ${number}${missionName}, superado`:current?`Reto ${number}${missionName}, continuar`:`Reto ${number}${missionName}, bloqueado`);
     if(current)b.onclick=startGame;nodes.append(b);
   });
   $('#previousWorld').disabled=mapWorld===0;$('#nextWorld').disabled=mapWorld>=unlocked||mapWorld===9;
@@ -151,6 +165,18 @@ function renderCollection(){
   const grid=$('#badgeGrid');grid.replaceChildren();
   worlds.forEach((W,i)=>{const unlocked=state.completed>=(i+1)*10,card=document.createElement('article');card.className='badgecard';card.classList.toggle('locked',!unlocked);card.innerHTML=`<span class="badge-medal" aria-hidden="true">${W.symbol}</span><strong>${unlocked?W.rank:'Por descubrir'}</strong><small>${W.place} · ${W.range}</small>`;grid.append(card);});
 }
+function renderJourney(){
+  const active=worldIndexForLevel(state.completed>=100?99:state.index),list=$('#journeyList');list.replaceChildren();
+  worlds.forEach((W,i)=>{
+    const done=state.completed>=(i+1)*10,current=i===active&&!done,locked=i>active,button=document.createElement('button');
+    button.type='button';button.className='journeycard';button.classList.toggle('done',done);button.classList.toggle('current',current);button.classList.toggle('locked',locked);button.disabled=locked;
+    const known=!locked,status=done?`Rango ${W.rank} conseguido`:current?'Tu destino actual':'Permanece oculto hasta completar el mundo anterior';
+    button.innerHTML=`<img src="./assets/worlds/${W.art}" alt="" width="120" height="80"><span><small>DESTINO ${i+1} · ${W.range}</small><strong>${known?W.place:'Por descubrir'}</strong><em>${status}</em></span>`;
+    button.setAttribute('aria-label',locked?`Destino ${i+1}, ${W.range}, por descubrir`:done?`${W.place}, ${W.range}, superado`:`${W.place}, ${W.range}, destino actual`);
+    if(!locked)button.onclick=()=>{$('#journeyOverview').close();mapWorld=i;drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});};
+    list.append(button);
+  });
+}
 function openAchievement(){
   if(pendingAchievement===null||$('#achievement').open)return;const W=worlds[pendingAchievement];
   $('#achievementBadge').textContent=W.symbol;$('#achievement').style.setProperty('--world-tone',W.tone);$('#achievementTitle').textContent=W.rank;
@@ -159,6 +185,8 @@ function openAchievement(){
 }
 $('#play').onclick=()=>openRuleCards(openMap);$('#home').onclick=e=>{e.preventDefault();home();};$('#mapHome').onclick=home;
 $('#badges').onclick=()=>{renderCollection();$('#collection').showModal();};$('[data-close="collection"]').onclick=()=>$('#collection').close();
+$('#journeyButton').onclick=()=>{renderJourney();$('#journeyOverview').showModal();$('#journeyList .current,#journeyList .done').focus({preventScroll:true});};$('[data-close="journey"]').onclick=()=>$('#journeyOverview').close();
+$('#journeyCurrent').onclick=()=>{$('#journeyOverview').close();mapWorld=worldIndexForLevel(state.completed>=100?99:state.index);drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});};
 $('#previousWorld').onclick=()=>{if(mapWorld>0){mapWorld--;drawMap();}};$('#nextWorld').onclick=()=>{if(mapWorld<unlockedWorldIndex(state)){mapWorld++;drawMap();}};
 $('#achievementContinue').onclick=()=>{const finished=pendingAchievement===9;$('#achievement').close();pendingAchievement=null;if(!finished)nextLevel(state);persist();openMap(finished?9:worldIndexForLevel(state.index));};
 $('#achievement').addEventListener('cancel',e=>e.preventDefault());

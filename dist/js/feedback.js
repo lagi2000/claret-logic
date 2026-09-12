@@ -14,8 +14,9 @@ export function play(kind,enabled=true) {
 }
 export function haptic(){try{navigator.vibrate?.(18);}catch{}}
 export function celebrate(milestone) {
-  if(!milestone||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
-  const box=document.createElement('div');box.className='confetti';box.setAttribute('aria-hidden','true');
-  for(let i=0;i<24;i++){const bit=document.createElement('i');bit.style.cssText=`left:${Math.random()*100}%;background:${['#e5006d','#ffc928','#36bd95','#4089ff'][i%4]};animation-delay:${Math.random()*.2}s`;box.append(bit);}
-  document.body.append(box);setTimeout(()=>box.remove(),1500);
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const box=document.createElement('div');box.className='confetti'+(milestone?'':' mini');box.setAttribute('aria-hidden','true');
+  const count=milestone?24:10;
+  for(let i=0;i<count;i++){const bit=document.createElement('i');bit.style.cssText=`left:${Math.random()*100}%;background:${['#e5006d','#ffc928','#36bd95','#4089ff'][i%4]};animation-delay:${Math.random()*.2}s`;box.append(bit);}
+  document.body.append(box);setTimeout(()=>box.remove(),milestone?1500:900);
 }
