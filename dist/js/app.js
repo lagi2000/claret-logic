@@ -6,7 +6,7 @@ import {KEY,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,c
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
 import {fittedBoardSize} from './layout.js';
-import {journeyStatus} from './journey.js';
+import {journeyStatus,solvedActionLabel} from './journey.js';
 const $=s=>document.querySelector(s), board=$('#board');
 let storage;try{storage=window.localStorage;}catch{}
 const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null;
@@ -26,7 +26,7 @@ function stats(){
   $('#tip').textContent=L.tip;
   $('#boardNote').textContent=practice?'Al colocar a Claret verás las consecuencias de tu elección.':'Las cruces solo aparecen cuando tú las colocas.';
   const milestone=!practice&&s.round.solved&&(s.index+1)%10===0;
-  $('#check').textContent=s.round.solved?(practice&&s.index===1?(onboarding?'Empezar los retos':'Volver a mi partida'):milestone?'Ver logro':'Ver recorrido'):'Comprobar';
+  $('#check').textContent=s.round.solved?solvedActionLabel({practice,index:s.index,onboarding,milestone}):'Comprobar';
   $('#check').disabled=milestone;
   $('#reset').disabled=s.round.solved;$('#hint').disabled=s.round.solved||(!practice&&s.helps===0);
   $('#leavePractice').hidden=!practice||onboarding;

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {journeyStatus} from '../dist/js/journey.js';
+import {journeyStatus,solvedActionLabel} from '../dist/js/journey.js';
 
 test('Cada reto ordinario completado vuelve al mapa con el siguiente activo',()=>{
   for(let index=0;index<99;index++){
@@ -17,4 +17,12 @@ test('Cada bloque de diez abre su logro y el nivel 100 conserva el cierre final'
 
 test('Un reto no resuelto nunca adelanta el recorrido',()=>{
   for(let index=0;index<100;index++)assert.equal(journeyStatus({index,completed:index,round:{solved:false}}).kind,'current');
+});
+
+test('Los botones resueltos describen correctamente el siguiente destino',()=>{
+  assert.equal(solvedActionLabel({practice:true,index:0,onboarding:true}),'Siguiente práctica');
+  assert.equal(solvedActionLabel({practice:true,index:1,onboarding:true}),'Empezar los retos');
+  assert.equal(solvedActionLabel({practice:true,index:1,onboarding:false}),'Volver a mi partida');
+  assert.equal(solvedActionLabel({milestone:true}),'Ver logro');
+  assert.equal(solvedActionLabel({}),'Ver recorrido');
 });
