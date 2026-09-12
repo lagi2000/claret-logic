@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#17385c">
+<title>Actualizar Claret Logic</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 50% 10%,#2f6e9d,#102d50 68%);color:white;font-family:ui-rounded,"Arial Rounded MT Bold",system-ui,sans-serif;text-align:center}.card{width:min(420px,100%);padding:28px;border:2px solid #bde3ff;border-radius:26px;background:#0d2949;box-shadow:0 18px 60px #06182c}.heart{font-size:4rem;filter:drop-shadow(0 5px 12px #ff8bb8);animation:pulse 1s ease-in-out infinite}h1{margin:12px 0 8px}p{color:#d8ebfb;line-height:1.5}.spinner{width:54px;height:54px;margin:22px auto;border:6px solid #ffffff35;border-top-color:#ffdc6d;border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}@keyframes pulse{50%{transform:scale(1.08)}}@media(prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body><main class="card"><div class="heart" aria-hidden="true">♥</div><h1>Actualizando Claret Logic</h1><p>Conservamos tu progreso y cargamos la última versión del juego.</p><div class="spinner" aria-hidden="true"></div><p id="status" role="status">Un momento…</p></main>
+<script>
+(async()=>{const base=new URL('./',location.href),prefix='claret-logic-'+encodeURIComponent(base.pathname)+'-';if('serviceWorker'in navigator){const registrations=await navigator.serviceWorker.getRegistrations();await Promise.all(registrations.filter(item=>item.scope.startsWith(base.href)).map(item=>item.unregister()));}if('caches'in window){const keys=await caches.keys();await Promise.all(keys.filter(key=>key.startsWith(prefix)).map(key=>caches.delete(key)));}document.querySelector('#status').textContent='Actualización completada.';location.replace('./?version=actual');})().catch(()=>{document.querySelector('#status').textContent='Abriendo el juego…';location.replace('./?version=actual');});
+</script></body></html>

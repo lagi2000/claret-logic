@@ -13,14 +13,14 @@ const sw=`const PREFIX='claret-logic-'+encodeURIComponent(new URL(self.registrat
 const CACHE=PREFIX+'${version}';
 const ASSETS=${JSON.stringify(['./',...list.map(f=>'./'+f)])};
 self.addEventListener('install',event=>{event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting()));});
-self.addEventListener('activate',event=>{event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
+self.addEventListener('activate',event=>{event.waitUntil((async()=>{const keys=await caches.keys();await Promise.all(keys.filter(k=>k.startsWith(PREFIX)&&k!==CACHE).map(k=>caches.delete(k)));await self.clients.claim();const windows=self.clients.matchAll?await self.clients.matchAll({type:'window'}):[];await Promise.all(windows.map(client=>client.navigate?client.navigate(client.url):null));})());});
 self.addEventListener('fetch',event=>{
  const url=new URL(event.request.url),scope=new URL(self.registration.scope);
  if(event.request.method!=='GET'||url.origin!==scope.origin||!url.pathname.startsWith(scope.pathname))return;
  const relative='./'+url.pathname.slice(scope.pathname.length);
  if(event.request.mode==='navigate'){
   if(!['./','./index.html'].includes(relative))return;
-  event.respondWith(caches.open(CACHE).then(async cache=>(await cache.match('./index.html'))||fetch(event.request)));return;
+  event.respondWith(caches.open(CACHE).then(async cache=>{try{const response=await fetch(event.request);if(response?.ok&&cache.put)await cache.put('./index.html',response.clone());return response;}catch{return cache.match('./index.html');}}));return;
  }
  if(!ASSETS.includes(relative))return;
  event.respondWith(caches.open(CACHE).then(async cache=>(await cache.match(relative))||fetch(event.request)));

@@ -224,7 +224,7 @@ $('#dailyContinue').onclick=()=>{$('#daily').close();const target=dailyReturnFoc
 $('#daily').addEventListener('cancel',e=>{if(state.daily.last<dateKey())e.preventDefault();});
 window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)return;try{state=normalize(JSON.parse(event.newValue));cleanRound(state);if(!practice){redraw();message('Partida actualizada desde otra pestaña.');}}catch{}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!$('#start').hidden&&!practice)stats();});
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{ /* Online play remains available. */ });
+if('serviceWorker' in navigator){let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});navigator.serviceWorker.register('./sw.js').then(registration=>registration.update()).catch(()=>{ /* Online play remains available. */ });}
 redraw();$('#play').focus();
 
 // Fixed teaching diagrams: examples illustrate one rule, not puzzle solutions.
