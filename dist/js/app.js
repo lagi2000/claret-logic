@@ -184,7 +184,7 @@ function startGame(){
   if(!practice&&state.index%10===0&&!state.seenWorlds.includes(worldIndexForLevel(state.index)))openWorldIntro();
   else{react('ready','¡Vamos a pensar!');queueMissionIntro();}
 }
-function home(){persist();practice=null;onboarding=false;if($('#daily').open)closeDaily(false);showScreen('start');repairActiveScreen();repairActiveScreen();redraw();$('#play').focus();}
+function home(){persist();practice=null;onboarding=false;if($('#daily').open)closeDaily(false);showScreen('start');repairActiveScreen();redraw();$('#play').focus();}
 function leavePractice(){practice=null;onboarding=false;redraw();openMap();}
 function renderDaily(){
   $('#dailyCount').textContent=state.daily.current;$('#dailyBest').textContent=`Mejor racha: ${state.daily.best}`;
@@ -323,7 +323,7 @@ window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)re
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){repairActiveScreen();if(!$('#start').hidden&&!practice)stats();}});
 window.addEventListener('pageshow',()=>{if($('#daily').open)closeDaily(false);repairActiveScreen();});
 if('serviceWorker' in navigator){let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});navigator.serviceWorker.register('./sw.js').then(registration=>registration.update()).catch(()=>{ /* Online play remains available. */ });}
-redraw();$('#play').focus();
+repairActiveScreen();redraw();$('#play').focus();
 
 // Fixed teaching diagrams: examples illustrate one rule, not puzzle solutions.
 const ruleCards=[
