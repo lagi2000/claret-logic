@@ -159,3 +159,5 @@ dialog:not([open]){display:none!important}
 
 @media(max-width:480px){.world-intro-art{height:min(42svh,320px)}.world-intro-copy{padding-bottom:20px}.world-intro-goal{grid-template-columns:1fr 1fr}.world-intro-goal span{text-align:right}.world-intro-goal strong{text-align:left}.achievement-actions{grid-template-columns:1fr}.badgecard{grid-template-columns:88px 42px minmax(0,1fr)}.badgecard>img{width:88px;height:70px}.badgecard>div p{display:none}}
 @media(prefers-reduced-motion:reduce){.cell,.cell::before,.cell .cross,.reward-toast{animation:none!important;transition:none!important}}
+
+.daily-actions{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:8px;width:100%}.daily-actions button{width:100%;min-height:44px}@media(max-width:340px){.daily-actions{grid-template-columns:1fr}}
