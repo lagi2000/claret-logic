@@ -10,7 +10,7 @@ import {journeyStatus,solvedActionLabel} from './journey.js';
 import {missionFor,seedMission,missionGate,missionProgress} from './missions.js';
 const $=s=>document.querySelector(s), board=$('#board');
 let storage;try{storage=window.localStorage;}catch{}
-const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null,reactionTimer=0,rewardTimer=0,dailyReturnFocus=null;
+const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null,reactionTimer=0,rewardTimer=0,dailyReturnFocus=null,dailyTimer=0;
 const palette=['#ffc8d9','#bde9d2','#bfe2ff','#ffe69b','#d9c8ff','#ffd5ad','#bdeef0'];
 const introducedMissions=new Set(),ambientSymbols=['✦','❋','○','◇','≈','•','✧','❋','◆','✦'];
 const current=()=>practice??state, level=()=>practice?tutorials[practice.index]:levels[state.index];
@@ -141,6 +141,7 @@ function check(){
   }else{drawBoard();message(result.message,'error');react('worry','Todavía hay algo que revisar');play('error',state.sound);}
 }
 function startGame(){
+  clearTimeout(dailyTimer);dailyTimer=0;
   if(!practice&&!state.tutorialDone){practice=beginTutorial(state);onboarding=true;}
   $('#start').hidden=true;$('#worldMap').hidden=true;$('#worldMap').inert=true;$('#game').hidden=false;$('#game').inert=false;
   // The map changes state.index without keeping a game screen mounted. Always
@@ -158,7 +159,19 @@ function renderDaily(){
   ['LUN','MAR','MIÉ','JUE','VIE','SÁB','DOM'].forEach((name,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);const key=dateKey(d),el=document.createElement('span'),b=document.createElement('b');el.textContent=name;b.className=(dates.has(key)?'on ':'')+(key===today?'today':'');b.textContent=dates.has(key)?'✓':'·';el.setAttribute('aria-label',`${key}: ${dates.has(key)?'racha activada':'sin activación'}`);el.append(b);$('#week').append(el);});
   const activated=state.daily.last>=today;$('#dailyContinue').disabled=!activated;$('#heart').disabled=activated;$('#heart').classList.toggle('lit',activated);$('#dailyMessage').textContent=activated?'Tu corazón de María ya está encendido hoy.':'Un pequeño gesto para comenzar.';
 }
-function openDaily(){if($('#missionIntro').open){$('#missionIntro').close();introducedMissions.delete(state.index);}dailyReturnFocus=document.activeElement;renderDaily();if(!$('#daily').open)$('#daily').showModal();}
+function openDaily(automatic=false){
+  if($('#daily').open)return true;
+  if(automatic&&(!$('#game').hidden||document.querySelector('dialog[open]')))return false;
+  if($('#worldIntro').open||$('#achievement').open||$('#rules').open||$('#collection').open||$('#journeyOverview').open)return false;
+  if($('#missionIntro').open){$('#missionIntro').close();introducedMissions.delete(state.index);}
+  clearTimeout(dailyTimer);dailyTimer=0;dailyReturnFocus=document.activeElement;renderDaily();$('#daily').showModal();return true;
+}
+function closeDaily(){
+  if($('#daily').open)$('#daily').close();
+  const target=dailyReturnFocus?.isConnected?dailyReturnFocus:$('#levelNodes .current,#play,#toolClaret');
+  target?.focus?.({preventScroll:true});dailyReturnFocus=null;
+  if(!$('#game').hidden&&!$('#worldIntro').open)queueMissionIntro();
+}
 function openWorldIntro(){
   const worldIndex=worldIndexForLevel(state.index),W=worlds[worldIndex];
   $('#worldIntroArt').src=`./assets/worlds/${W.art}`;$('#worldIntroArt').alt=`Escenario de ${W.place}`;
@@ -199,7 +212,7 @@ function openMap(index=worldIndexForLevel(state.completed>=100?99:state.index)){
   if(journey.kind==='advance'){nextLevel(state);index=worldIndexForLevel(state.index);}
   persist();practice=null;onboarding=false;mapWorld=Math.min(unlockedWorldIndex(state),Math.max(0,index));
   $('#start').hidden=true;$('#game').hidden=true;$('#game').inert=true;$('#worldMap').hidden=false;$('#worldMap').inert=false;$('#worldMap').classList.add('map-enter');drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});setTimeout(()=>$('#worldMap').classList.remove('map-enter'),560);
-  if(journey.kind==='achievement'){pendingAchievement=journey.world;setTimeout(openAchievement,120);}else if(state.daily.last<dateKey())setTimeout(openDaily,180);
+  clearTimeout(dailyTimer);dailyTimer=0;if(journey.kind==='achievement'){pendingAchievement=journey.world;setTimeout(openAchievement,120);}else if(state.daily.last<dateKey())dailyTimer=setTimeout(()=>openDaily(true),180);
 }
 function renderCollection(){
   const grid=$('#badgeGrid');grid.replaceChildren();
@@ -259,8 +272,9 @@ $('#toolClaret').onclick=()=>setTool('c');$('#toolX').onclick=()=>setTool('x');$
 $('#reset').onclick=()=>{const s=current();if(!resetRound(s))return;persist();redraw();message(s.round.lives===3?'Has gastado las 3 vidas. Sigues en este reto con 3 vidas.':'Tablero reiniciado. Has gastado una vida.');play('error',state.sound);};
 $('#sound').onclick=()=>{state.sound=!state.sound;persist();stats();play('place',state.sound);};
 $('#heart').onclick=()=>{const result=activateDay(state);persist();renderDaily();stats();if(result.changed){$('#heart').classList.add('lit');$('#dailyMessage').textContent=result.reward?'Has recuperado una ayuda. ¡Racha encendida!':'Racha encendida. Vuelve mañana para continuar.';play('win',state.sound);haptic();$('#dailyContinue').focus();}};
-$('#dailyContinue').onclick=()=>{$('#daily').close();const target=dailyReturnFocus?.isConnected?dailyReturnFocus:$('#levelNodes .current,#play,#toolClaret');target?.focus?.({preventScroll:true});dailyReturnFocus=null;if(!$('#game').hidden)queueMissionIntro();};
-$('#daily').addEventListener('cancel',e=>{if(state.daily.last<dateKey())e.preventDefault();});
+$('#dailyContinue').onclick=closeDaily;
+$('#dailySkip').onclick=closeDaily;
+$('#daily').addEventListener('cancel',e=>{e.preventDefault();closeDaily();});
 window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)return;try{state=normalize(JSON.parse(event.newValue));cleanRound(state);if(!practice){redraw();message('Partida actualizada desde otra pestaña.');}}catch{}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'&&!$('#start').hidden&&!practice)stats();});
 if('serviceWorker' in navigator){let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});navigator.serviceWorker.register('./sw.js').then(registration=>registration.update()).catch(()=>{ /* Online play remains available. */ });}
