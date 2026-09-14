@@ -1,6 +1,7 @@
 export const KEY='claretLogic.v4';
 export const ranks=['Explorador','Aprendiz','Observador','Estratega','Experto','Maestro','Mente brillante','Genio lógico','Gran estratega','Mente Claret'];
 const integer=(v,min,max,fallback)=>Number.isInteger(v)&&v>=min&&v<=max?v:fallback;
+const clone=value=>typeof globalThis.structuredClone==='function'?globalThis.structuredClone(value):JSON.parse(JSON.stringify(value));
 export function fresh(){return {version:4,tutorialRevision:2,tutorialDone:false,tutorialIndex:0,tutorialRound:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false},index:0,completed:0,helps:3,streak:0,sound:true,daily:{last:'',current:0,best:0},seenWorlds:[],round:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false}};}
 export function normalize(raw) {
   const s=fresh();if(!raw||typeof raw!=='object')return s;
@@ -38,11 +39,11 @@ export function migrateV3(raw){
   if(old.index<2){s.tutorialIndex=old.index;s.tutorialRound=old.round;s.round=fresh().round;}
   return s;
 }
-export function beginTutorial(s,replay=false){return {index:replay?0:s.tutorialIndex,round:replay?fresh().round:structuredClone(s.tutorialRound),completed:0,helps:3,streak:0};}
+export function beginTutorial(s,replay=false){return {index:replay?0:s.tutorialIndex,round:replay?fresh().round:clone(s.tutorialRound),completed:0,helps:3,streak:0};}
 export function advanceTutorial(s,practice,onboarding){
   if(!practice.round.solved)return false;
-  if(practice.index===0){practice.index=1;practice.round=fresh().round;if(onboarding){s.tutorialIndex=1;s.tutorialRound=structuredClone(practice.round);}return true;}
-  if(onboarding){s.tutorialDone=true;s.tutorialIndex=1;s.tutorialRound=structuredClone(practice.round);}return false;
+  if(practice.index===0){practice.index=1;practice.round=fresh().round;if(onboarding){s.tutorialIndex=1;s.tutorialRound=clone(practice.round);}return true;}
+  if(onboarding){s.tutorialDone=true;s.tutorialIndex=1;s.tutorialRound=clone(practice.round);}return false;
 }
 export function save(storage,state){try{storage.setItem(KEY,JSON.stringify(state));return true;}catch{return false;}}
 export function resetRound(s){if(s.round.solved)return false;const next=s.round.lives-1;s.round={marks:{},lives:next||3,usedHelp:s.round.usedHelp,helpStep:0,solved:false};return true;}
