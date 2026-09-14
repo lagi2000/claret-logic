@@ -48,7 +48,7 @@ test('El nivel y el progreso abren exactamente el mundo correspondiente',()=>{
 
 test('La interfaz incluye recorrido, racha, misiones y celebración accesibles',async()=>{
   const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
-  for(const id of ['worldMap','worldScene','worldAmbience','levelNodes','achievement','collection','badgeGrid','journeyButton','journeyOverview','journeyList','journeyCurrent','startDaily','mapDaily','gameDaily','daily','missionIntro','claretReaction'])assert.match(html,new RegExp(`id="${id}"`));
+  for(const id of ['worldMap','worldScene','worldAmbience','levelNodes','achievement','collection','badgeGrid','journeyButton','journeyOverview','journeyList','journeyCurrent','startDaily','mapDaily','gameDaily','daily','missionIntro','claretReaction','worldIntro','worldIntroArt','worldIntroContinue','rewardToast','achievementArt','shareAchievement'])assert.match(html,new RegExp(`id="${id}"`));
   assert.match(html,/aria-labelledby="worldTitle"/);
   assert.match(html,/aria-labelledby="achievementTitle"/);
   assert.match(html,/aria-labelledby="collectionTitle"/);
@@ -67,4 +67,15 @@ test('El tablero aprovecha el ancho sin crecer fuera de la altura visible',()=>{
   assert.equal(fittedBoardSize({viewport:700,contentHeight:520,boardSize:170,maxWidth:345}),330);
   assert.equal(fittedBoardSize({viewport:844,contentHeight:650,boardSize:320,maxWidth:345}),345);
   assert.equal(fittedBoardSize({viewport:480,contentHeight:600,boardSize:220,maxWidth:300}),168);
+});
+
+test('La experiencia familiar incorpora postal, álbum visual, tarjeta y movimiento reducido',async()=>{
+  const [html,css,app]=await Promise.all([
+    readFile(new URL('../dist/index.html',import.meta.url),'utf8'),
+    readFile(new URL('../dist/styles.css',import.meta.url),'utf8'),
+    readFile(new URL('../dist/js/app.js',import.meta.url),'utf8')
+  ]);
+  assert.match(html,/id="worldIntro"/);assert.match(html,/id="shareAchievement"/);assert.match(html,/id="rewardToast"/);
+  assert.match(css,/\.world-intro/);assert.match(css,/\.reward-toast/);assert.match(css,/prefers-reduced-motion/);
+  assert.match(app,/function openWorldIntro/);assert.match(app,/async function shareAchievement/);assert.match(app,/state\.seenWorlds/);
 });
