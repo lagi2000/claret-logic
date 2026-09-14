@@ -1,5 +1,5 @@
 import {conflictRules} from './engine.js';
-import {nextHint} from './pedagogy.js';
+import {safeDeductions} from './pedagogy.js';
 import {worlds} from './worlds.js';
 
 const missionType=index=>({2:'started',4:'logical',6:'intruder',9:'boss'})[index%10]??'classic';
@@ -13,8 +13,14 @@ export function missionFor(index,L){
     return {type,short:'Claret ya ha empezado',title:'CLARET YA HA EMPEZADO',copy:'Claret te deja una posición segura. Utilízala para deducir las demás.',symbol:'▶',fixed:[fixed],seed:{[fixed]:'c'}};
   }
   if(type==='logical'){
-    const hint=nextHint(L,{}),expected=hint?.type==='exclude'?'x':'c';
-    return {type,short:'La jugada lógica',title:'LA JUGADA LÓGICA',copy:'Encuentra y marca la primera deducción segura antes de resolver el resto.',symbol:'?',target:hint?.target??positions(L)[0],expected};
+    const validMoves=safeDeductions(L,{}).map(move=>({tool:move.type==='exclude'?'x':'c',cell:move.target,reason:move.reason}));
+    const tools=new Set(validMoves.map(move=>move.tool));
+    const copy=tools.size>1
+      ?'Empieza con cualquier deducción segura: coloca un Claret obligatorio o descarta una casilla imposible.'
+      :tools.has('x')
+        ?'Empieza descartando cualquier casilla que sea imposible. Puede haber varias deducciones correctas.'
+        :'Empieza colocando a Claret en cualquier casilla obligatoria. Puede haber varias deducciones correctas.';
+    return {type,short:'La jugada lógica',title:'LA JUGADA LÓGICA',copy,symbol:'?',validMoves,preferredTool:tools.has('c')?'c':'x'};
   }
   if(type==='intruder'){
     const solution=positions(L),fixed=solution[0],column=fixed%L.size;
@@ -33,7 +39,6 @@ export function seedMission(index,L,round){
 export function missionGate(mission,marks,tool,cell){
   if(!mission)return null;
   if(mission.fixed?.includes(cell)&&marks[cell]==='c')return 'Ese es el Claret guía: su posición es segura y no se puede retirar.';
-  if(mission.type==='logical'&&marks[mission.target]!==mission.expected&&(tool!==mission.expected||cell!==mission.target))return 'Aún no. Busca una primera deducción que puedas justificar con las tres normas.';
   if(mission.type==='intruder'&&marks[mission.intruder]==='c'&&!(tool==='c'&&cell===mission.intruder))return 'Primero compara los dos Claret y retira al intruso que rompe una norma.';
   return null;
 }
@@ -41,7 +46,7 @@ export function missionGate(mission,marks,tool,cell){
 export function missionProgress(mission,marks){
   if(!mission)return '';
   if(mission.type==='started')return 'Claret guía colocado';
-  if(mission.type==='logical')return marks[mission.target]===mission.expected?'Primera deducción conseguida':'Primera deducción pendiente';
+  if(mission.type==='logical')return mission.validMoves.some(move=>marks[move.cell]===move.tool)?'Primera deducción conseguida':'Primera deducción pendiente';
   if(mission.type==='intruder')return marks[mission.intruder]==='c'?'Intruso por localizar':'Intruso localizado';
   return 'Desafío de rango';
 }
