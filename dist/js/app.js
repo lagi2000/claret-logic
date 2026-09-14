@@ -73,20 +73,24 @@ function drawBoard(){
 }
 function redraw(){
   const s=current();if(!practice)seedMission(s.index,level(),s.round);
-  highlights=[];pendingHint=null;focusCell=0;$('#hintText').hidden=true;drawBoard();
+  highlights=[];pendingHint=null;focusCell=0;$('#hintText').hidden=true;
   const mission=practice?null:missionFor(s.index,level());
+  if(mission?.type==='logical'&&!Object.keys(s.round.marks).length&&mission.preferredTool)tool=mission.preferredTool;
+  drawBoard();setTool(tool);
   message(s.round.solved?'¡Reto superado! Puedes continuar.':mission?.type==='intruder'?'Compara los dos Claret. Uno de ellos rompe una norma.':mission?.type==='logical'?'Busca primero una deducción completamente segura.':'Elige una casilla para empezar.',s.round.solved?'success':'');
 }
 function mark(k){
   const s=current();if(s.round.solved)return;
   focusCell=k;const marks=s.round.marks,L=level(),mission=practice?null:missionFor(s.index,L),gate=missionGate(mission,marks,tool,k),auto=practice?autoMarks(L,marks):new Set();
+  const logicalBefore=mission?.type==='logical'&&missionProgress(mission,marks)==='Primera deducción conseguida';
   if(gate){highlights=mission?.type==='intruder'?[...mission.fixed,mission.intruder]:mission?.fixed??[];drawBoard();message(gate,'error');react('worry','Revisa esa relación');play('error',state.sound);return;}
   if(tool==='x'&&marks[k]==='c'){message('Selecciona Claret para retirar esa figura.');react('worry','Primero cambia de herramienta');return;}
   if(tool==='x'&&auto.has(k)&&marks[k]!=='x'){message('Esta X depende de tu hipótesis. Retira el Claret que la provoca para revisarla.');react('think','Revisa tu hipótesis');return;}
   if(marks[k]===tool)delete marks[k];else marks[k]=tool;
   highlights=[];pendingHint=null;s.round.helpStep=0;$('#hintText').hidden=true;
   persist();drawBoard();const cell=board.querySelector(`[data-cell="${k}"]`);cell.focus({preventScroll:true});if(tool==='c'&&marks[k]==='c'){cell.classList.add('selected');pulseConsequences(k,L);react('think','Veamos qué implica…');}
-  const missionMoment=mission?.type==='intruder'&&k===mission.intruder&&!marks[k]?'¡Intruso localizado! Ahora completa el tablero.':mission?.type==='logical'&&k===mission.target&&marks[k]===mission.expected?'¡Primera deducción conseguida! Continúa con el tablero.':'';
+  const logicalAfter=mission?.type==='logical'&&missionProgress(mission,marks)==='Primera deducción conseguida';
+  const missionMoment=mission?.type==='intruder'&&k===mission.intruder&&!marks[k]?'¡Intruso localizado! Ahora completa el tablero.':!logicalBefore&&logicalAfter?'¡Primera deducción conseguida! Continúa con el tablero.':'';
   if(missionMoment)react('spark','¡Buena deducción!');
   message(missionMoment|| (tool==='c'?(practice?'Hipótesis actualizada. Revisa sus consecuencias.':'Claret colocado. Ahora decide tus descartes.'):'Descarte actualizado.'),missionMoment?'success':'');play(tool==='c'?'place':'x',state.sound);haptic();
 }
