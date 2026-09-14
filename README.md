@@ -1,6 +1,6 @@
-# Claret Logic · 3.2.0 RC3
+# Claret Logic · 3.4.0 RC1
 
-Dos prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Cada mundo combina seis retos clásicos con «Claret ya ha empezado», «La jugada lógica», «Detecta al intruso» y un gran reto final. La cuadrícula mantiene el protagonismo con límites de región limpios, reacciones de Claret y consecuencias visuales sin revelar soluciones. La racha diaria dispone de acceso permanente y apertura automática cuando está pendiente. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución.
+Dos prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Cada mundo combina seis retos clásicos con «Claret ya ha empezado», «La jugada lógica», «Detecta al intruso» y un gran reto final. La cuadrícula mantiene el protagonismo con límites de región limpios, reacciones de Claret y consecuencias visuales sin revelar soluciones. Esta versión incorpora postales de entrada a cada destino, respuesta táctil reforzada, celebraciones graduadas, álbum visual de viaje y tarjetas familiares descargables. La racha diaria dispone de acceso permanente y apertura automática cuando está pendiente. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución.
 
 Las actualizaciones consultan primero la versión publicada y recargan automáticamente al cambiar. Si un navegador móvil conserva una edición anterior, `actualizar.html` limpia únicamente los recursos web de Claret Logic y mantiene intacto el progreso guardado.
 
