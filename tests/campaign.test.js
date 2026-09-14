@@ -48,7 +48,7 @@ test('El nivel y el progreso abren exactamente el mundo correspondiente',()=>{
 
 test('La interfaz incluye recorrido, racha, misiones y celebración accesibles',async()=>{
   const html=await readFile(new URL('../dist/index.html',import.meta.url),'utf8');
-  for(const id of ['worldMap','worldScene','worldAmbience','levelNodes','achievement','collection','badgeGrid','journeyButton','journeyOverview','journeyList','journeyCurrent','startDaily','mapDaily','gameDaily','daily','missionIntro','claretReaction','worldIntro','worldIntroArt','worldIntroContinue','rewardToast','achievementArt','shareAchievement'])assert.match(html,new RegExp(`id="${id}"`));
+  for(const id of ['worldMap','worldScene','worldAmbience','levelNodes','achievement','collection','badgeGrid','journeyButton','journeyOverview','journeyList','journeyCurrent','startDaily','mapDaily','gameDaily','daily','dailySkip','missionIntro','claretReaction','worldIntro','worldIntroArt','worldIntroContinue','rewardToast','achievementArt','shareAchievement'])assert.match(html,new RegExp(`id="${id}"`));
   assert.match(html,/aria-labelledby="worldTitle"/);
   assert.match(html,/aria-labelledby="achievementTitle"/);
   assert.match(html,/aria-labelledby="collectionTitle"/);
@@ -78,4 +78,18 @@ test('La experiencia familiar incorpora postal, álbum visual, tarjeta y movimie
   assert.match(html,/id="worldIntro"/);assert.match(html,/id="shareAchievement"/);assert.match(html,/id="rewardToast"/);
   assert.match(css,/\.world-intro/);assert.match(css,/\.reward-toast/);assert.match(css,/prefers-reduced-motion/);
   assert.match(app,/function openWorldIntro/);assert.match(app,/async function shareAchievement/);assert.match(app,/state\.seenWorlds/);
+});
+
+
+test('La racha diaria se puede aplazar y no se superpone con el juego',async()=>{
+  const [html,app]=await Promise.all([
+    readFile(new URL('../dist/index.html',import.meta.url),'utf8'),
+    readFile(new URL('../dist/js/app.js',import.meta.url),'utf8')
+  ]);
+  assert.match(html,/id="dailySkip"/);
+  assert.match(app,/function closeDaily\(\)/);
+  assert.match(app,/clearTimeout\(dailyTimer\)/);
+  assert.match(app,/setTimeout\(\(\)=>openDaily\(true\),180\)/);
+  assert.match(app,/\$\('#dailySkip'\)\.onclick=closeDaily/);
+  assert.match(app,/addEventListener\('cancel',e=>\{e\.preventDefault\(\);closeDaily\(\);\}\)/);
 });
