@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {levels} from '../dist/js/levels.js';
 import {conflictRules,diagnose} from '../dist/js/engine.js';
+import {safeDeductions} from '../dist/js/pedagogy.js';
 import {missionFor,seedMission,missionGate,missionProgress} from '../dist/js/missions.js';
 
 const solutionCells=L=>L.solution.map((column,row)=>row*L.size+column);
@@ -24,16 +25,42 @@ test('Claret ya ha empezado coloca una única guía correcta y protegida',()=>{
   }
 });
 
-test('La jugada lógica exige una deducción válida sin señalarla en el mensaje',()=>{
+test('La jugada lógica acepta todas las primeras deducciones seguras y nunca bloquea el tablero',()=>{
   for(let index=4;index<100;index+=10){
-    const L=levels[index],mission=missionFor(index,L),marks={};
-    assert.ok(Number.isInteger(mission.target));
-    assert.ok(['c','x'].includes(mission.expected));
-    const wrong=(mission.target+1)%(L.size**2);
-    assert.match(missionGate(mission,marks,mission.expected,wrong),/deducción/);
-    assert.equal(missionGate(mission,marks,mission.expected,mission.target),null);
-    marks[mission.target]=mission.expected;
-    assert.equal(missionProgress(mission,marks),'Primera deducción conseguida');
+    const L=levels[index],mission=missionFor(index,L);
+    assert.ok(mission.validMoves.length>0,`Reto ${L.n} sin deducción inicial`);
+    const unique=new Set(mission.validMoves.map(move=>`${move.tool}:${move.cell}`));
+    assert.equal(unique.size,mission.validMoves.length);
+    for(const move of mission.validMoves){
+      assert.equal(missionGate(mission,{},move.tool,move.cell),null);
+      assert.equal(missionProgress(mission,{[move.cell]:move.tool}),'Primera deducción conseguida');
+    }
+    for(let cell=0;cell<L.size**2;cell++)for(const tool of ['c','x'])assert.equal(missionGate(mission,{},tool,cell),null);
+  }
+});
+
+test('El reto 5 admite tanto la casilla rosa como la azul como primeras deducciones',()=>{
+  const L=levels[4],mission=missionFor(4,L);
+  const placements=mission.validMoves.filter(move=>move.tool==='c').map(move=>move.cell);
+  assert.ok(placements.includes(3));
+  assert.ok(placements.includes(12));
+});
+
+test('El reto 15 ofrece varias exclusiones seguras y selecciona Descartar sin bloquear otras jugadas',()=>{
+  const L=levels[14],mission=missionFor(14,L);
+  assert.equal(mission.preferredTool,'x');
+  assert.ok(mission.validMoves.filter(move=>move.tool==='x').length>1);
+  for(let cell=0;cell<L.size**2;cell++)assert.equal(missionGate(mission,{},'c',cell),null);
+});
+
+test('Las deducciones inmediatas son compatibles con la solución única en los 100 retos',()=>{
+  for(const L of levels){
+    const solution=new Set(solutionCells(L)),moves=safeDeductions(L,{});
+    assert.ok(moves.length>0,`Reto ${L.n} sin salida lógica inicial`);
+    for(const move of moves){
+      if(move.type==='place')assert.ok(solution.has(move.target),`Claret inseguro en reto ${L.n}`);
+      else assert.ok(!solution.has(move.target),`Descarte inseguro en reto ${L.n}`);
+    }
   }
 });
 
