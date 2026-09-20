@@ -82,3 +82,20 @@ test('Detecta al intruso presenta un conflicto real y conserva una guía correct
 test('Cada décimo reto anuncia el lugar y el rango correspondiente',()=>{
   for(let index=9;index<100;index+=10){const mission=missionFor(index,levels[index]);assert.equal(mission.type,'boss');assert.match(mission.title,/GRAN RETO/);assert.match(mission.copy,/rango/i);}
 });
+
+test('Los 100 retos admiten completar una partida desde el estado inicial de su misión',()=>{
+  for(let index=0;index<levels.length;index++){
+    const L=levels[index],mission=missionFor(index,L),round={marks:{}};
+    seedMission(index,L,round);
+    if(mission?.type==='intruder'){
+      assert.equal(missionGate(mission,round.marks,'c',mission.intruder),null);
+      delete round.marks[mission.intruder];
+    }
+    for(const cell of solutionCells(L)){
+      if(round.marks[cell]==='c')continue;
+      assert.equal(missionGate(mission,round.marks,'c',cell),null,`Reto ${index+1} bloqueado en casilla ${cell}`);
+      round.marks[cell]='c';
+    }
+    assert.equal(diagnose(L,round.marks).ok,true,`Reto ${index+1} no se puede completar`);
+  }
+});

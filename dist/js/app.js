@@ -217,7 +217,8 @@ function openWorldIntro(){
 }
 function queueMissionIntro(){
   if(practice||introducedMissions.has(state.index))return;const mission=missionFor(state.index,level());if(!mission)return;
-  $('#missionIntro').dataset.mission=mission.type;$('#missionIntroSymbol').textContent=mission.symbol;$('#missionIntroTitle').textContent=mission.title;$('#missionIntroCopy').textContent=mission.copy;setTimeout(()=>{if(!$('#daily').open&&!$('#missionIntro').open){introducedMissions.add(state.index);$('#missionIntro').showModal();$('#missionIntroContinue').focus();}},140);
+  const missionIndex=state.index;
+  $('#missionIntro').dataset.mission=mission.type;$('#missionIntroSymbol').textContent=mission.symbol;$('#missionIntroTitle').textContent=mission.title;$('#missionIntroCopy').textContent=mission.copy;setTimeout(()=>{if(!$('#game').hidden&&!practice&&state.index===missionIndex&&!$('#daily').open&&!document.querySelector('dialog[open]')){introducedMissions.add(missionIndex);$('#missionIntro').showModal();$('#missionIntroContinue').focus();}},140);
 }
 function renderAmbience(){
   const layer=$('#worldAmbience'),symbol=ambientSymbols[mapWorld];layer.replaceChildren();layer.dataset.world=mapWorld;
@@ -267,7 +268,9 @@ function renderJourney(){
   });
 }
 function openAchievement(){
-  if(pendingAchievement===null||$('#achievement').open)return;const W=worlds[pendingAchievement];
+  if(pendingAchievement===null||$('#achievement').open||($('#game').hidden&&$('#worldMap').hidden))return;
+  if(document.querySelector('dialog[open]')){setTimeout(openAchievement,250);return;}
+  const W=worlds[pendingAchievement];
   $('#achievementBadge').textContent=W.symbol;$('#achievement').style.setProperty('--world-tone',W.tone);$('#achievementTitle').textContent=W.rank;$('#achievementPlace').textContent=W.place;
   $('#achievementArt').src=`./assets/worlds/${W.art}`;$('#achievementArt').alt=`Escenario de ${W.place}`;$('#achievementStats').textContent=`${(pendingAchievement+1)*10} retos completados · Destino ${pendingAchievement+1}/10`;
   $('#achievementCopy').textContent=pendingAchievement===9?'Has superado los 100 retos y alcanzado el rango máximo: Mente Claret.':'Has superado 10 nuevos retos. Tu insignia se ha añadido a la colección.';
@@ -322,7 +325,9 @@ document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#daily'
 window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)return;try{state=normalize(JSON.parse(event.newValue));cleanRound(state);if(!practice){redraw();message('Partida actualizada desde otra pestaña.');}}catch{}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){repairActiveScreen();if(!$('#start').hidden&&!practice)stats();}});
 window.addEventListener('pageshow',()=>{if($('#daily').open)closeDaily(false);repairActiveScreen();});
-if('serviceWorker' in navigator){let refreshing=false;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(refreshing)return;refreshing=true;location.reload();});navigator.serviceWorker.register('./sw.js').then(registration=>registration.update()).catch(()=>{ /* Online play remains available. */ });}
+// Keep the current board and dialogs intact while a new offline version installs.
+// Fresh files are loaded the next time the player opens the game.
+if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(registration=>registration.update()).catch(()=>{ /* Online play remains available. */ });}
 repairActiveScreen();redraw();$('#play').focus();
 
 // Fixed teaching diagrams: examples illustrate one rule, not puzzle solutions.

@@ -1,3 +1,9 @@
+# 3.5.0 · publicación
+
+- Evitada la recarga automática de las pestañas abiertas al actualizar la PWA: la racha, las misiones y el tablero conservan su interacción durante la partida.
+- Las presentaciones de misión pendientes comprueban el reto y la pantalla activos antes de abrirse; los logros esperan a que se cierre cualquier otro diálogo.
+- Verificados 102 tableros (dos prácticas y cien retos), 100 soluciones únicas distintas, 100 caminos completables desde sus misiones y 159 pruebas automáticas.
+
 # 3.1.0 RC1
 
 - Corregido el cálculo responsive que reducía progresivamente el tablero en algunos iPhone; ahora prioriza el ancho útil y mide solo la altura real del contenido.
