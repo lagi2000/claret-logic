@@ -47,6 +47,14 @@ async function requestInstall(){
 }
 $('#storageWarning').hidden=!initial.warning;
 function message(text,kind=''){$('#message').textContent=text;$('#message').className='message '+kind;}
+function victoryMessage(){
+  const s=current(),title=document.createElement('strong'),detail=document.createElement('small');
+  title.textContent=practice?'¡Práctica superada!':s.index===99?'¡Eres Mente Claret!':'¡Reto superado!';
+  const W=worlds[worldIndexForLevel(s.index)],done=s.index%10+1;
+  detail.textContent=practice?(s.index===0?'Ya dominas el primer tablero. Vamos al siguiente.':'Ya puedes comenzar tu viaje.'):
+    `${W.place} · ${done}/10 retos completados${done<10?` · A ${10-done} del rango ${W.rank}`:` · Rango ${W.rank} conseguido`}`;
+  $('#message').className='message success victory-message';$('#message').replaceChildren(title,detail);
+}
 function react(kind,text){
   const box=$('#claretReaction');clearTimeout(reactionTimer);box.className=`claret-reaction ${kind}`;$('#reactionText').textContent=text;box.hidden=false;
   reactionTimer=setTimeout(()=>{box.hidden=true;},kind==='win'?1800:1100);
@@ -62,6 +70,7 @@ function pulseConsequences(origin,L){
   setTimeout(()=>board.querySelectorAll('.rule-origin,.rule-effect').forEach(cell=>cell.classList.remove('rule-origin','rule-effect')),680);
 }
 function stats(){
+  $('.play').classList.toggle('is-solved',current().round.solved);
   const s=current(),L=level();$('#level').textContent=L.n;$('#levelLabel').textContent=practice?'Práctica':'Reto';$('#levelTotal').textContent=practice?' / 2':' / 100';$('#difficulty').textContent=practice?'PRÁCTICA · TUTORIAL':L.difficulty.toLocaleUpperCase('es');
   $('#rank').textContent=earnedRank(state.completed);$('#progress').value=state.completed;
   $('#lives').textContent='♥ '.repeat(s.round.lives).trim();$('#lives').setAttribute('aria-label',`${s.round.lives} vidas`);
@@ -111,6 +120,7 @@ function redraw(){
   if(mission?.type==='logical'&&!Object.keys(s.round.marks).length&&mission.preferredTool)tool=mission.preferredTool;
   drawBoard();setTool(tool);
   message(s.round.solved?'¡Reto superado! Puedes continuar.':mission?.type==='intruder'?'Compara los dos Claret. Uno de ellos rompe una norma.':mission?.type==='logical'?'Busca primero una deducción completamente segura.':'Elige una casilla para empezar.',s.round.solved?'success':'');
+  if(s.round.solved)victoryMessage();
 }
 function mark(k){
   const s=current();if(s.round.solved)return;
@@ -170,6 +180,8 @@ function check(){
     else if(!practice&&s.streak>0&&s.streak%3===0)reward(`${s.streak} retos sin ayuda · ¡Mente despierta!`);
     message(practice?'¡Correcto! Práctica completada.':s.index===99?'¡Has completado Claret Logic! Tu rango es Mente Claret.':milestone?`¡Reto superado! Nuevo rango: ${earnedRank(s.completed)}.`:'¡Correcto! Reto superado.','success');
     $('#hintText').hidden=true;react('win',milestone?'¡Nuevo rango!':'¡Reto superado!');play(milestone?'badge':'win',state.sound);haptic('win');celebrate(milestone);
+    victoryMessage();
+    if(!milestone)$('#check').focus({preventScroll:true});
     if(milestone){pendingAchievement=worldIndexForLevel(s.index);setTimeout(openAchievement,450);}
   }else{drawBoard();message(result.message,'error');react('worry','Todavía hay algo que revisar');play('error',state.sound);}
 }

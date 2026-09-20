@@ -174,3 +174,15 @@ dialog:not([open]){display:none!important}
 .install-card{position:relative;width:min(430px,100%);max-height:calc(100svh - 32px);overflow:auto;padding:26px;border:2px solid #9bd0f4;border-radius:24px;background:linear-gradient(155deg,#fff,#eaf6ff);color:#17385c;box-shadow:0 18px 0 #061b3655,0 34px 80px #061b3690}
 .install-card h2{font-size:clamp(1.7rem,6vw,2.2rem);margin:8px 0}.install-card p{font-size:1rem;line-height:1.45}.install-steps{padding-left:24px;margin:18px 0}.install-steps li{margin:12px 0;font-weight:750;line-height:1.35}.install-steps li::marker{color:#d60061;font-weight:900}
 .install-close{position:absolute;right:14px;top:14px;width:42px;min-height:42px;padding:0;border-radius:50%;background:#edf5fb;font-size:1.6rem}.install-card .primary{width:100%;min-height:50px}
+
+/* A clear finish: keep the solved puzzle visible and give continuation priority. */
+.play.is-solved .board{border-color:#15836a;box-shadow:0 5px 0 #9bd9c8,0 0 0 3px #d7f6e9}
+.play.is-solved .actions{grid-template-columns:1fr}
+.play.is-solved .actions #reset,.play.is-solved .actions #hint{display:none}
+.play.is-solved #check{min-height:50px;background:linear-gradient(#139779,#087358);box-shadow:0 4px 0 #065340,inset 0 1px 0 #ffffff50}
+.victory-message{border:1px solid #a8ddc8;background:linear-gradient(120deg,#e2f8ed,#f3fff7)!important;text-align:center;padding:10px 12px!important}
+.victory-message strong{display:block;font-size:clamp(1.1rem,3.5vw,1.45rem);line-height:1.2}
+.victory-message small{display:block;font-size:.78rem;line-height:1.4;margin-top:4px;color:#286651}
+.play.is-solved .board img{animation:victoryGlow .55s ease-out}
+@keyframes victoryGlow{50%{filter:drop-shadow(0 0 9px #fff5a5);transform:scale(1.05)}}
+@media(prefers-reduced-motion:reduce){.play.is-solved .board img{animation:none}}
