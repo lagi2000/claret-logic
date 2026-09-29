@@ -186,3 +186,9 @@ dialog:not([open]){display:none!important}
 .play.is-solved .board img{animation:victoryGlow .55s ease-out}
 @keyframes victoryGlow{50%{filter:drop-shadow(0 0 9px #fff5a5);transform:scale(1.05)}}
 @media(prefers-reduced-motion:reduce){.play.is-solved .board img{animation:none}}
+
+/* Rewards never steal a tap. Tall dialogs remain reachable with large text. */
+.reward-toast{pointer-events:none}
+.achievement,.world-intro{overflow-y:auto;overscroll-behavior:contain}
+.achievement{max-height:calc(100svh - max(28px,env(safe-area-inset-top)) - max(28px,env(safe-area-inset-bottom)))}
+.world-intro{max-height:calc(100svh - max(20px,env(safe-area-inset-top)) - max(20px,env(safe-area-inset-bottom)))}

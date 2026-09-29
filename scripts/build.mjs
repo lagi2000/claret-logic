@@ -20,7 +20,7 @@ self.addEventListener('fetch',event=>{
  const relative='./'+url.pathname.slice(scope.pathname.length);
  if(event.request.mode==='navigate'){
   if(!['./','./index.html'].includes(relative))return;
-  event.respondWith(caches.open(CACHE).then(async cache=>{try{const response=await fetch(event.request);if(response?.ok&&cache.put)await cache.put('./index.html',response.clone());return response;}catch{return cache.match('./index.html');}}));return;
+  event.respondWith(caches.open(CACHE).then(async cache=>(await cache.match('./index.html'))||fetch(event.request)));return;
  }
  if(!ASSETS.includes(relative))return;
  event.respondWith(caches.open(CACHE).then(async cache=>(await cache.match(relative))||fetch(event.request)));

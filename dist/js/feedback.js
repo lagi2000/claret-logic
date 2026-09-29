@@ -5,13 +5,14 @@ const patterns={
   logical:{notes:[523,659],wave:'triangle',gain:.04,step:.07},
   error:{notes:[220,196],wave:'sine',gain:.035,step:.09},
   win:{notes:[523,659,784],wave:'sine',gain:.04,step:.085},
-  badge:{notes:[392,523,659,784,1047],wave:'triangle',gain:.045,step:.09}
+  badge:{notes:[392,523,659,784,1047],wave:'triangle',gain:.045,step:.09},
+  heart:{notes:[392,523,659,784],wave:'sine',gain:.035,step:.095}
 };
 export function play(kind,enabled=true) {
   if(!enabled)return;
   try {
     const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
-    context??=new Audio();if(context.state==='suspended')void context.resume();
+    context??=new Audio();if(context.state==='suspended')void context.resume().catch(()=>{});
     const sound=patterns[kind]??patterns.place;
     sound.notes.forEach((frequency,i)=>{
       const t=context.currentTime+i*sound.step,o=context.createOscillator(),gain=context.createGain();

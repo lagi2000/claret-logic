@@ -22,3 +22,7 @@ test('Migración RC1 conserva la partida al descontar las dos prácticas',async(
 test('Repetir prácticas ya realizadas no modifica el progreso',async()=>{const {beginTutorial,advanceTutorial}=await import('../dist/js/state.js');const s=fresh();s.tutorialDone=true;s.completed=60;s.index=60;const before=JSON.stringify(s),p=beginTutorial(s,true);p.round.solved=true;advanceTutorial(s,p,false);p.round.solved=true;advanceTutorial(s,p,false);assert.equal(JSON.stringify(s),before);});
 
 test('Los destinos presentados se conservan y se normalizan sin duplicados',()=>{const s=normalize({seenWorlds:[0,0,4,9,-1,10,'2']});assert.deepEqual(s.seenWorlds,[0,4,9]);const freshState=fresh();assert.deepEqual(freshState.seenWorlds,[]);});
+test('Los logros vistos se recuperan sin aceptar mundos sin completar',()=>{
+ const s=normalize({completed:30,celebratedWorlds:[0,0,2,3,9,-1,'1']});
+ assert.deepEqual(s.celebratedWorlds,[0,2]);
+});

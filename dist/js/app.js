@@ -10,7 +10,7 @@ import {journeyStatus,solvedActionLabel} from './journey.js';
 import {missionFor,seedMission,missionGate,missionProgress} from './missions.js';
 const $=s=>document.querySelector(s), board=$('#board'), cloneRound=value=>typeof structuredClone==='function'?structuredClone(value):JSON.parse(JSON.stringify(value));
 let storage;try{storage=window.localStorage;}catch{}
-const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null,reactionTimer=0,rewardTimer=0,dailyReturnFocus=null,dailyTimer=0,lastBoardTouch=0,installPrompt=null,installReturnFocus=null;
+const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null,reactionTimer=0,rewardTimer=0,rewardHideTimer=0,dailyReturnFocus=null,dailyTimer=0,installPrompt=null,installReturnFocus=null,shareCardPromise=null;
 const palette=['#ffc8d9','#bde9d2','#bfe2ff','#ffe69b','#d9c8ff','#ffd5ad','#bdeef0'];
 const introducedMissions=new Set(),ambientSymbols=['✦','❋','○','◇','≈','•','✧','❋','◆','✦'];
 const current=()=>practice??state, level=()=>practice?tutorials[practice.index]:levels[state.index];
@@ -60,8 +60,8 @@ function react(kind,text){
   reactionTimer=setTimeout(()=>{box.hidden=true;},kind==='win'?1800:1100);
 }
 function reward(text){
-  const toast=$('#rewardToast');clearTimeout(rewardTimer);$('#rewardToastText').textContent=text;toast.hidden=false;toast.classList.remove('leaving');
-  rewardTimer=setTimeout(()=>{toast.classList.add('leaving');setTimeout(()=>{toast.hidden=true;toast.classList.remove('leaving');},220);},2200);
+  const toast=$('#rewardToast');clearTimeout(rewardTimer);clearTimeout(rewardHideTimer);$('#rewardToastText').textContent=text;toast.hidden=false;toast.classList.remove('leaving');
+  rewardTimer=setTimeout(()=>{toast.classList.add('leaving');rewardHideTimer=setTimeout(()=>{toast.hidden=true;toast.classList.remove('leaving');},220);},2200);
 }
 function pulseConsequences(origin,L){
   if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
@@ -84,12 +84,13 @@ function stats(){
   $('#boardNote').textContent=practice?'Al colocar a Claret verás las consecuencias de tu elección.':'Las cruces solo aparecen cuando tú las colocas.';
   const milestone=!practice&&s.round.solved&&(s.index+1)%10===0;
   $('#check').textContent=s.round.solved?solvedActionLabel({practice,index:s.index,onboarding,milestone}):'Comprobar';
-  $('#check').disabled=milestone;
+  $('#check').disabled=false;
   $('#reset').disabled=s.round.solved;$('#hint').disabled=s.round.solved||(!practice&&s.helps===0);
   $('#leavePractice').hidden=!practice||onboarding;
   $('#sound').setAttribute('aria-pressed',String(state.sound));$('#sound').setAttribute('aria-label',state.sound?'Desactivar sonido':'Activar sonido');$('#sound').textContent=state.sound?'♪':'♪̸';
   document.querySelectorAll('.daily-button').forEach(button=>button.classList.toggle('due',state.daily.last<dateKey()));
   $('#resume').textContent=state.completed===100?'Has completado los 100 retos.':state.index?`Continúa en el reto ${state.index+1}.`:'100 retos. A tu ritmo.';
+  $('#play').setAttribute('aria-label',state.tutorialDone?'Continuar partida':'Jugar');
 }
 function drawBoard(){
   const s=current(),L=level(),n=L.size,mission=practice?null:missionFor(s.index,L),auto=practice?autoMarks(L,s.round.marks):new Set();
@@ -105,8 +106,8 @@ function drawBoard(){
     b.setAttribute('aria-pressed',String(v==='c'));b.setAttribute('aria-disabled',String(s.round.solved));
     if(v==='c'){const img=document.createElement('img');img.src='./assets/claret.jpeg';img.alt='';b.append(img);}
     else if(isX){const cross=document.createElement('span');cross.className='cross';cross.textContent='×';cross.setAttribute('aria-hidden','true');b.append(cross);}
-    b.ontouchend=e=>{e.preventDefault();lastBoardTouch=Date.now();safeMark(k);};
-    b.onclick=()=>{if(Date.now()-lastBoardTouch>650)safeMark(k);};b.onkeydown=e=>{
+    // Native click covers taps, mouse and keyboard without firing on a swipe.
+    b.onclick=()=>safeMark(k);b.onkeydown=e=>{
       let target=k;if(e.key==='ArrowLeft')target=Math.max(r*n,k-1);else if(e.key==='ArrowRight')target=Math.min(r*n+n-1,k+1);else if(e.key==='ArrowUp')target=Math.max(0,k-n);else if(e.key==='ArrowDown')target=Math.min(n*n-1,k+n);else if(e.key==='Home')target=r*n;else if(e.key==='End')target=r*n+n-1;else return;
       e.preventDefault();focusCell=target;board.querySelectorAll('button').forEach(cell=>cell.tabIndex=Number(cell.dataset.cell)===target?0:-1);board.querySelector(`[data-cell="${target}"]`).focus();
     };board.append(b);
@@ -170,7 +171,9 @@ function showHint(){
   $('#hintText').hidden=false;persist();drawBoard();play('place',state.sound);
 }
 function check(){
-  const s=current();if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}const go=()=>{if(nextLevel(s)){persist();openMap();}else openMap(9);};if(matchMedia('(prefers-reduced-motion: reduce)').matches)go();else{$('#game').classList.add('level-exit');setTimeout(()=>{$('#game').classList.remove('level-exit');go();},320);}return;}
+  const s=current();if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}
+    if(journeyStatus(state).kind==='achievement'){pendingAchievement=worldIndexForLevel(state.index);openAchievement();return;}
+    if(nextLevel(s))persist();openMap();return;}
   const result=diagnose(level(),s.round.marks);highlights=result.cells;
   if(result.ok){
     const helpsBefore=s.helps;
@@ -261,7 +264,7 @@ function openMap(index=worldIndexForLevel(state.completed>=100?99:state.index)){
   if(journey.kind==='advance'){nextLevel(state);index=worldIndexForLevel(state.index);}
   persist();practice=null;onboarding=false;mapWorld=Math.min(unlockedWorldIndex(state),Math.max(0,index));
   if($('#daily').open)closeDaily(false);showScreen('map');repairActiveScreen();$('#worldMap').classList.add('map-enter');drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});setTimeout(()=>$('#worldMap').classList.remove('map-enter'),560);
-  clearTimeout(dailyTimer);dailyTimer=0;if(journey.kind==='achievement'){pendingAchievement=journey.world;setTimeout(openAchievement,120);}else if(state.daily.last<dateKey())dailyTimer=setTimeout(()=>openDaily(true),180);
+  clearTimeout(dailyTimer);dailyTimer=0;if(journey.kind==='achievement'){pendingAchievement=journey.world;setTimeout(openAchievement,120);}else if(journey.kind!=='complete'&&state.daily.last<dateKey())dailyTimer=setTimeout(()=>openDaily(true),180);
 }
 function renderCollection(){
   const grid=$('#badgeGrid');grid.replaceChildren();
@@ -281,14 +284,17 @@ function renderJourney(){
 }
 function openAchievement(){
   if(pendingAchievement===null||$('#achievement').open||($('#game').hidden&&$('#worldMap').hidden))return;
-  if(document.querySelector('dialog[open]')){setTimeout(openAchievement,250);return;}
+  // The green "Ver logro" button remains available if another dialog is open.
+  if(document.querySelector('dialog[open]'))return;
   const W=worlds[pendingAchievement];
   $('#achievementBadge').textContent=W.symbol;$('#achievement').style.setProperty('--world-tone',W.tone);$('#achievementTitle').textContent=W.rank;$('#achievementPlace').textContent=W.place;
   $('#achievementArt').src=`./assets/worlds/${W.art}`;$('#achievementArt').alt=`Escenario de ${W.place}`;$('#achievementStats').textContent=`${(pendingAchievement+1)*10} retos completados · Destino ${pendingAchievement+1}/10`;
   $('#achievementCopy').textContent=pendingAchievement===9?'Has superado los 100 retos y alcanzado el rango máximo: Mente Claret.':'Has superado 10 nuevos retos. Tu insignia se ha añadido a la colección.';
-  $('#achievementContinue').textContent=pendingAchievement===9?'Ver mi recorrido completo':'Descubrir el siguiente mundo';$('#shareAchievement').textContent='Guardar tarjeta';$('#achievement').showModal();$('#achievementContinue').focus();
+  $('#achievementContinue').textContent=pendingAchievement===9?'Ver mi recorrido completo':'Descubrir el siguiente mundo';$('#shareAchievement').textContent='Compartir logro';
+  shareCardPromise=createAchievementCard(pendingAchievement).catch(()=>null);
+  $('#achievement').showModal();$('#achievementContinue').focus();
 }
-$('#play').onclick=()=>openRuleCards(openMap);$('#home').onclick=e=>{e.preventDefault();home();};$('#mapHome').onclick=home;
+$('#play').onclick=()=>state.tutorialDone?openMap():openRuleCards(openMap);$('#home').onclick=e=>{e.preventDefault();home();};$('#mapHome').onclick=home;
 $('#startDaily').onclick=()=>openDaily();$('#mapDaily').onclick=()=>openDaily();$('#gameDaily').onclick=()=>openDaily();
 $('#installGame').onclick=()=>requestInstall().catch(showInstallGuide);$('#installClose').onclick=closeInstallGuide;$('#installConfirm').onclick=closeInstallGuide;
 $('#installOverlay').onclick=e=>{if(e.target===$('#installOverlay'))closeInstallGuide();};
@@ -299,23 +305,44 @@ $('#badges').onclick=()=>{renderCollection();$('#collection').showModal();};$('[
 $('#journeyButton').onclick=()=>{renderJourney();$('#journeyOverview').showModal();$('#journeyList .current,#journeyList .done').focus({preventScroll:true});};$('[data-close="journey"]').onclick=()=>$('#journeyOverview').close();
 $('#journeyCurrent').onclick=()=>{$('#journeyOverview').close();mapWorld=worldIndexForLevel(state.completed>=100?99:state.index);drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});};
 $('#previousWorld').onclick=()=>{if(mapWorld>0){mapWorld--;drawMap();}};$('#nextWorld').onclick=()=>{if(mapWorld<unlockedWorldIndex(state)){mapWorld++;drawMap();}};
-async function shareAchievement(){
-  if(pendingAchievement===null)return;const W=worlds[pendingAchievement],canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=1080;canvas.height=1350;
+async function createAchievementCard(worldIndex){
+  const W=worlds[worldIndex],canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=1080;canvas.height=1350;
   const gradient=ctx.createLinearGradient(0,0,1080,1350);gradient.addColorStop(0,W.tone);gradient.addColorStop(1,'#102d50');ctx.fillStyle=gradient;ctx.fillRect(0,0,1080,1350);
   const image=new Image();image.src=`./assets/worlds/${W.art}`;try{await image.decode();const scale=Math.max(1080/image.width,620/image.height),w=image.width*scale,h=image.height*scale;ctx.drawImage(image,(1080-w)/2,(620-h)/2,w,h);}catch{}
   const shade=ctx.createLinearGradient(0,250,0,680);shade.addColorStop(0,'transparent');shade.addColorStop(1,'#102d50');ctx.fillStyle=shade;ctx.fillRect(0,0,1080,680);
-  ctx.textAlign='center';ctx.fillStyle='#ffe29a';ctx.font='900 34px system-ui';ctx.fillText('CLARET LOGIC · LOGRO CONSEGUIDO',540,700);
+  ctx.textAlign='center';ctx.fillStyle='#ffe29a';ctx.font='900 34px system-ui';ctx.fillText('CLARET LOGIC · HE CONSEGUIDO',540,700);
   const fit=(text,max,start)=>{let size=start;do{ctx.font=`900 ${size}px system-ui`;size-=2;}while(ctx.measureText(text).width>max&&size>38);return ctx.font;};
   ctx.fillStyle='white';fit(W.place,920,86);ctx.fillText(W.place,540,800);ctx.fillStyle='#ffe29a';fit(W.rank.toLocaleUpperCase('es'),900,76);ctx.fillText(W.rank.toLocaleUpperCase('es'),540,900);
   ctx.beginPath();ctx.arc(540,1035,76,0,Math.PI*2);ctx.fillStyle='#fff7d0';ctx.fill();ctx.fillStyle=W.tone;ctx.font='900 72px system-ui';ctx.fillText(W.symbol,540,1060);
-  ctx.fillStyle='white';ctx.font='800 38px system-ui';ctx.fillText(`${(pendingAchievement+1)*10} retos completados · Destino ${pendingAchievement+1} de 10`,540,1170);ctx.font='700 30px system-ui';ctx.fillStyle='#d8ebfb';ctx.fillText('Piensa · Coloca · Avanza',540,1235);ctx.font='600 24px system-ui';ctx.fillText('Creado por Luis A. García · Claret Sevilla',540,1290);
-  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));if(!blob)return;
-  const file=new File([blob],`claret-logic-${pendingAchievement+1}.png`,{type:'image/png'}),button=$('#shareAchievement');
-  if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({title:'Mi logro en Claret Logic',text:`He alcanzado el rango ${W.rank} en Claret Logic.`,files:[file]});button.textContent='Tarjeta compartida';}
-  else{const url=URL.createObjectURL(blob),link=document.createElement('a');link.href=url;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);button.textContent='Tarjeta guardada';}
+  ctx.fillStyle='white';ctx.font='800 38px system-ui';ctx.fillText(`Nivel ${(worldIndex+1)*10} · Destino ${worldIndex+1} de 10`,540,1160);ctx.font='750 31px system-ui';ctx.fillStyle='#ffe29a';ctx.fillText('¿PUEDES SUPERARME?',540,1220);ctx.font='600 25px system-ui';ctx.fillStyle='#d8ebfb';ctx.fillText('lagi2000.github.io/claret-logic',540,1280);
+  const blob=await new Promise(resolve=>canvas.toBlob(resolve,'image/png'));
+  if(!blob)throw Error('No se pudo preparar la tarjeta');
+  return new File([blob],`claret-logic-${worldIndex+1}.png`,{type:'image/png'});
 }
-$('#shareAchievement').onclick=()=>shareAchievement().catch(()=>{$('#shareAchievement').textContent='Inténtalo de nuevo';});
-function continueAchievement(){const finished=pendingAchievement===9;$('#achievement').close();pendingAchievement=null;if(!finished)nextLevel(state);persist();openMap(finished?9:worldIndexForLevel(state.index));}
+async function shareAchievement(){
+  if(pendingAchievement===null)return;
+  const button=$('#shareAchievement'),worldIndex=pendingAchievement,W=worlds[worldIndex];button.disabled=true;
+  let file;
+  try{
+    file=await (shareCardPromise??createAchievementCard(worldIndex));
+    if(!file)throw Error('No se pudo preparar la tarjeta');
+    const url=new URL('./',location.href).href,text=`He conseguido ${W.rank} en Claret Logic (nivel ${(worldIndex+1)*10}). ¿Puedes superarme? ${url}`;
+    if(navigator.share&&navigator.canShare?.({files:[file]})){
+      await navigator.share({title:'Mi logro en Claret Logic',text,files:[file]});button.textContent='Tarjeta compartida';
+    }else{
+      downloadAchievement(file);button.textContent='Tarjeta guardada';
+    }
+  }catch(error){if(error?.name!=='AbortError'){
+    if(file){downloadAchievement(file);button.textContent='Tarjeta guardada';}
+    else button.textContent='Reintentar compartir';
+  }}
+  finally{button.disabled=false;}
+}
+function downloadAchievement(file){const objectUrl=URL.createObjectURL(file),link=document.createElement('a');link.href=objectUrl;link.download=file.name;link.click();setTimeout(()=>URL.revokeObjectURL(objectUrl),1000);}
+$('#shareAchievement').onclick=shareAchievement;
+function continueAchievement(){if(pendingAchievement===null)return;const finished=pendingAchievement===9;
+  if(!state.celebratedWorlds.includes(pendingAchievement))state.celebratedWorlds.push(pendingAchievement);
+  $('#achievement').close();pendingAchievement=null;shareCardPromise=null;if(!finished)nextLevel(state);persist();openMap(finished?9:worldIndexForLevel(state.index));}
 $('#achievementContinue').onclick=continueAchievement;
 $('#achievement').addEventListener('cancel',e=>{e.preventDefault();continueAchievement();});
 function continueWorldIntro(){const world=worldIndexForLevel(state.index);if(!state.seenWorlds.includes(world))state.seenWorlds.push(world);persist();$('#worldIntro').close();repairActiveScreen();react('ready','¡Comienza el viaje!');$('#toolClaret').focus();queueMissionIntro();}
@@ -330,11 +357,22 @@ $('#tutorial').onclick=()=>{onboarding=!state.tutorialDone;practice=beginTutoria
 $('#toolClaret').onclick=()=>setTool('c');$('#toolX').onclick=()=>setTool('x');$('#hint').onclick=showHint;$('#check').onclick=check;
 $('#reset').onclick=()=>{const s=current();if(!resetRound(s))return;persist();redraw();message(s.round.lives===3?'Has gastado las 3 vidas. Sigues en este reto con 3 vidas.':'Tablero reiniciado. Has gastado una vida.');play('error',state.sound);};
 $('#sound').onclick=()=>{state.sound=!state.sound;persist();stats();play('place',state.sound);};
-$('#heart').onclick=()=>{const result=activateDay(state);persist();renderDaily();stats();if(result.changed){$('#heart').classList.add('lit');$('#dailyMessage').textContent=result.reward?'Has recuperado una ayuda. ¡Racha encendida!':'Racha encendida. Vuelve mañana para continuar.';play('win',state.sound);haptic();$('#dailyContinue').focus();}};
+$('#heart').onclick=()=>{const previousBest=state.daily.best,result=activateDay(state);persist();renderDaily();stats();if(result.changed){$('#heart').classList.add('lit');$('#dailyMessage').textContent=result.reward?'Has recuperado una ayuda. ¡Racha encendida!':state.daily.best>previousBest&&previousBest>0?`¡Nuevo récord: ${state.daily.best} días! Vuelve mañana.`:'Racha encendida. Vuelve mañana para continuar.';play('heart',state.sound);haptic();$('#dailyContinue').focus();}};
 $('#dailyContinue').onclick=()=>closeDaily();
 $('#dailySkip').onclick=()=>closeDaily();$('#dailyClose').onclick=()=>closeDaily();$('#dailyBackdrop').onclick=()=>closeDaily();
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#daily').open){e.preventDefault();closeDaily();}else if(!$('#installOverlay').hidden){e.preventDefault();closeInstallGuide();}});
-window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)return;try{state=normalize(JSON.parse(event.newValue));cleanRound(state);if(!practice){redraw();message('Partida actualizada desde otra pestaña.');}}catch{}});
+window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)return;try{
+  const previousIndex=state.index;state=normalize(JSON.parse(event.newValue));cleanRound(state);
+  if(practice)return;
+  if(previousIndex!==state.index){
+    for(const selector of ['#worldIntro','#missionIntro','#achievement'])if($(selector).open)$(selector).close();
+    pendingAchievement=null;shareCardPromise=null;openMap();
+  }else{
+    redraw();if(!$('#worldMap').hidden)drawMap();
+    if($('#daily').open)renderDaily();
+    message('Partida actualizada desde otra pestaña.');
+  }
+}catch{}});
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){repairActiveScreen();if(!$('#start').hidden&&!practice)stats();}});
 window.addEventListener('pageshow',()=>{if($('#daily').open)closeDaily(false);repairActiveScreen();});
 // Keep the current board and dialogs intact while a new offline version installs.

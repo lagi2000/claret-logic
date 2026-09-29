@@ -2,7 +2,7 @@ export const KEY='claretLogic.v4';
 export const ranks=['Explorador','Aprendiz','Observador','Estratega','Experto','Maestro','Mente brillante','Genio lógico','Gran estratega','Mente Claret'];
 const integer=(v,min,max,fallback)=>Number.isInteger(v)&&v>=min&&v<=max?v:fallback;
 const clone=value=>typeof globalThis.structuredClone==='function'?globalThis.structuredClone(value):JSON.parse(JSON.stringify(value));
-export function fresh(){return {version:4,tutorialRevision:2,tutorialDone:false,tutorialIndex:0,tutorialRound:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false},index:0,completed:0,helps:3,streak:0,sound:true,daily:{last:'',current:0,best:0},seenWorlds:[],round:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false}};}
+export function fresh(){return {version:4,tutorialRevision:2,tutorialDone:false,tutorialIndex:0,tutorialRound:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false},index:0,completed:0,helps:3,streak:0,sound:true,daily:{last:'',current:0,best:0},seenWorlds:[],celebratedWorlds:[],round:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false}};}
 export function normalize(raw) {
   const s=fresh();if(!raw||typeof raw!=='object')return s;
   s.tutorialDone=raw.tutorialDone===true;s.tutorialIndex=integer(raw.tutorialIndex,0,1,0);
@@ -15,6 +15,7 @@ export function normalize(raw) {
   if(raw.daily&&typeof raw.daily==='object')s.daily={last:typeof raw.daily.last==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(raw.daily.last)?raw.daily.last:'',current:integer(raw.daily.current,0,100000,0),best:integer(raw.daily.best,0,100000,0)};
   s.daily.best=Math.max(s.daily.current,s.daily.best);
   s.seenWorlds=Array.isArray(raw.seenWorlds)?[...new Set(raw.seenWorlds.filter(value=>Number.isInteger(value)&&value>=0&&value<10))]:[];
+  s.celebratedWorlds=Array.isArray(raw.celebratedWorlds)?[...new Set(raw.celebratedWorlds.filter(value=>Number.isInteger(value)&&value>=0&&value<10&&raw.completed>=(value+1)*10))]:[];
   const round=raw.round;
   if(round&&typeof round==='object')s.round={marks:Object.fromEntries(Object.entries(round.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<49&&['c','x'].includes(v))),lives:integer(round.lives,1,3,3),usedHelp:round.usedHelp===true,helpStep:integer(round.helpStep,0,2,0),solved:round.solved===true};
   return s;

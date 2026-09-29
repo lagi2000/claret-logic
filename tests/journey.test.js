@@ -15,6 +15,24 @@ test('Cada bloque de diez abre su logro y el nivel 100 conserva el cierre final'
   }
 });
 
+test('El logro final se presenta una vez y al continuar permanece cerrado tras recargar',async()=>{
+  const {fresh,complete,save,load}=await import('../dist/js/state.js');
+  const state=fresh();state.index=99;state.completed=99;complete(state);
+  assert.equal(journeyStatus(state).kind,'achievement');
+  state.celebratedWorlds.push(9);
+  const data=new Map(),storage={getItem:key=>data.get(key)??null,setItem:(key,value)=>data.set(key,value)};
+  save(storage,state);
+  const restored=load(storage).state;
+  assert.equal(journeyStatus(restored).kind,'complete');
+  assert.equal(restored.completed,100);
+  assert.equal(restored.round.solved,true);
+});
+
+test('Un logro intermedio ya celebrado avanza una sola vez al siguiente reto',()=>{
+  const state={index:9,completed:10,round:{solved:true},celebratedWorlds:[0]};
+  assert.deepEqual(journeyStatus(state),{kind:'advance',nextIndex:10,world:1});
+});
+
 test('Un reto no resuelto nunca adelanta el recorrido',()=>{
   for(let index=0;index<100;index++)assert.equal(journeyStatus({index,completed:index,round:{solved:false}}).kind,'current');
 });

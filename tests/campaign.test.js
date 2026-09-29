@@ -105,7 +105,8 @@ test('La interacción táctil y las pantallas nunca conservan un bloqueo invisib
   assert.match(html,/id="dailyBackdrop"/);assert.match(html,/id="dailyClose"/);
   assert.match(css,/\.daily-backdrop/);assert.match(css,/\.board,\.cell\{touch-action:manipulation\}/);
   assert.match(app,/function showScreen\(name\)/);assert.match(app,/removeAttribute\('inert'\)/);
-  assert.match(app,/b\.ontouchend=e=>/);assert.match(app,/function safeMark\(k\)/);
+  assert.match(app,/b\.onclick=\(\)=>safeMark\(k\)/);assert.doesNotMatch(app,/ontouchend/);
+  assert.match(app,/function safeMark\(k\)/);
   assert.match(app,/\$\('#daily'\)\.show\(\)/);assert.doesNotMatch(app,/\$\('#daily'\)\.showModal\(\)/);
   assert.match(app,/\$\('#startDaily'\)\.onclick=\(\)=>openDaily\(\)/);
   assert.match(state,/typeof globalThis\.structuredClone==='function'/);

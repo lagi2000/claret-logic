@@ -1,3 +1,12 @@
+# 3.6.0 · cierre de flujo
+
+- Corregido el bucle del logro final de Mente Claret: el cierre queda registrado y se recupera tras recargar. Los otros nueve logros avanzan exactamente un reto al continuar.
+- El botón «Ver logro» permanece pulsable incluso si otra ventana ha aplazado la celebración. El paso al mapa se realiza sin temporizador vulnerable a dobles pulsaciones.
+- Unificada la entrada en las casillas con el clic nativo, válido para toque, ratón y teclado; arrastrar ya no se interpreta como jugada. La portada recuerda la partida sin volver a imponer el carrusel a quien ya terminó el tutorial.
+- Tarjeta de rango compartible con nivel, destino, enlace público y reto amistoso; descarga de imagen si la plataforma no admite compartir archivos.
+- Corazón de María con señal sonora propia y aviso de récord diario. Ventanas de logro y destino desplazables en pantallas de poca altura; avisos de recompensa sin interceptar toques.
+- HTML y módulos de la PWA se leen desde una sola versión de caché; la próxima apertura adopta la actualización descargada. Verificados 102 tableros, 100 soluciones deductivas y el recorrido completo de 100 retos con diez rangos.
+
 # 3.5.0 · publicación
 
 - Evitada la recarga automática de las pestañas abiertas al actualizar la PWA: la racha, las misiones y el tablero conservan su interacción durante la partida.
