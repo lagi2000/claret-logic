@@ -1,4 +1,10 @@
-# QA · Claret Logic 3.1.0 RC1
+# QA · Claret Logic 3.6.0
+
+## Cierre de septiembre de 2026
+
+Se verificaron 163 pruebas automáticas, la auditoría de las 102 cuadrículas y la certificación deductiva de los 100 retos. Una prueba de flujo recorre las dos prácticas, cada reto con sus misiones, guarda y recupera en cada nivel, muestra los diez rangos una sola vez y comprueba que el final no vuelve a abrirse. La interacción de las casillas usa clic nativo para toque, ratón y teclado; un arrastre no coloca una marca. La caché PWA se comprueba en simulación con la página y los módulos de la misma versión, tanto con conexión como sin ella.
+
+Se publicó mediante GitHub Actions y se revisó la página pública en Chrome de escritorio. La comprobación en un iPhone, Android y tablet físicos, la instalación y uso sin conexión bajo HTTPS y la prueba con alumnado siguen requiriendo una sesión específica en esos dispositivos. Las menciones, vidas y racha pertenecen a un puzle sin tiempo ni muerte: agotar vidas reinicia el tablero del mismo reto y conserva el progreso; no existe pantalla de «game over» ni salto o controles de movimiento.
 
 ## Estado
 
@@ -35,7 +41,7 @@ Decisión de producto aprobada y aplicada. Certificación lógica: **100/100**, 
 | Tres reinicios de tablero | Mismo reto con tres vidas |
 | Flecha derecha dentro del tablero | El foco pasa a la siguiente casilla |
 | Abrir reglas y pulsar Escape | Diálogo cerrado |
-| Preparar y resolver reto 100 mediante la interfaz | Mensaje final, rango Mente Claret; botón final desactivado |
+| Preparar y resolver reto 100 mediante la interfaz | Mensaje final y rango Mente Claret; el logro puede cerrarse para ver el recorrido |
 | Anchuras de marco 320, 390, 768 y 1280 px, tablero 7×7 | Sin desbordamiento horizontal |
 | Texto al 200 % en marco de 390 px | Ampliación real comprobada (título 56 px); reflujo sin desbordamiento horizontal |
 

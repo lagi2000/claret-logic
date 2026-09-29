@@ -182,7 +182,7 @@ function check(){
     if(recoveredHelp)reward('15 retos sin ayuda · Recuperas una ayuda');
     else if(!practice&&s.streak>0&&s.streak%3===0)reward(`${s.streak} retos sin ayuda · ¡Mente despierta!`);
     message(practice?'¡Correcto! Práctica completada.':s.index===99?'¡Has completado Claret Logic! Tu rango es Mente Claret.':milestone?`¡Reto superado! Nuevo rango: ${earnedRank(s.completed)}.`:'¡Correcto! Reto superado.','success');
-    $('#hintText').hidden=true;react('win',milestone?'¡Nuevo rango!':'¡Reto superado!');play(milestone?'badge':'win',state.sound);haptic('win');celebrate(milestone);
+    $('#hintText').hidden=true;react('win',practice?'¡Práctica superada!':milestone?'¡Nuevo rango!':'¡Reto superado!');play(milestone?'badge':'win',state.sound);haptic('win');celebrate(milestone);
     victoryMessage();
     if(!milestone)$('#check').focus({preventScroll:true});
     if(milestone){pendingAchievement=worldIndexForLevel(s.index);setTimeout(openAchievement,450);}
