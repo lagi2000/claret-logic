@@ -1,3 +1,9 @@
+## 3.6.1 · Actualización visible
+
+- La instalación PWA descarga recursos frescos; aviso de actualización sin interrumpir la partida.
+- Acceso a actualizar desde portada y versión visible. La recuperación conserva localStorage.
+- El tablero mantiene los números de región únicamente en nombres accesibles.
+
 # 3.6.0 · cierre de flujo
 
 - Corregido el bucle del logro final de Mente Claret: el cierre queda registrado y se recupera tras recargar. Los otros nueve logros avanzan exactamente un reto al continuar.

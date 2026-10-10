@@ -1,14 +1,14 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';import vm from 'node:vm';
 const source=fs.readFileSync(new URL('../dist/sw.js',import.meta.url),'utf8');
 function runtime({online=false}={}){
- const events={},stores=new Map(),deleted=[],navigated=[],lifecycleState={skipWaiting:false},scope='https://colegio.example/juegos/claret/',foreign='claret-logic-%2Fotra-app%2F-old';let fetches=0;stores.set(foreign,new Map());
+ const events={},stores=new Map(),deleted=[],navigated=[],lifecycleState={skipWaiting:false,reloadRequests:0},scope='https://colegio.example/juegos/claret/',foreign='claret-logic-%2Fotra-app%2F-old';let fetches=0;stores.set(foreign,new Map());
  stores.set('claret-logic-%2Fjuegos%2Fclaret%2F-old',new Map());
  const caches={keys:async()=>[...stores.keys()],delete:async k=>{deleted.push(k);return stores.delete(k);},open:async k=>{
    if(!stores.has(k))stores.set(k,new Map());const m=stores.get(k);
-   return {addAll:async files=>{for(const f of files)m.set(f,{url:f,body:'cached '+f});},match:async request=>m.get(typeof request==='string'?request:request.url),put:async(key,value)=>m.set(key,value)};
+   return {addAll:async files=>{for(const f of files){if(f.cache==='reload')lifecycleState.reloadRequests++;const key='./'+new URL(f.url).pathname.slice(new URL(scope).pathname.length);m.set(key,{url:key,body:'cached '+key});}},match:async request=>m.get(typeof request==='string'?request:request.url),put:async(key,value)=>m.set(key,value)};
  }};
  const fetch=async request=>{fetches++;if(!online)throw Error('offline');return {ok:true,url:request.url,clone(){return this;}};};
- vm.runInNewContext(source,{URL,caches,fetch,self:{registration:{scope},clients:{claim:async()=>{},matchAll:async()=>[{url:scope,navigate:async url=>navigated.push(url)}]},skipWaiting:async()=>{lifecycleState.skipWaiting=true;},addEventListener:(name,handler)=>events[name]=handler}});
+ vm.runInNewContext(source,{URL,Request,caches,fetch,self:{registration:{scope},clients:{claim:async()=>{},matchAll:async()=>[{url:scope,navigate:async url=>navigated.push(url)}]},skipWaiting:async()=>{lifecycleState.skipWaiting=true;},addEventListener:(name,handler)=>events[name]=handler}});
  const lifecycle=async name=>{let p;events[name]({waitUntil:value=>p=value});await p;};
  const request=async(path,mode='cors',method='GET')=>{let p;events.fetch({request:{url:scope+path,mode,method},respondWith:value=>p=value});return p?await p:null;};
  return {events,stores,deleted,navigated,foreign,lifecycleState,get fetches(){return fetches;},lifecycle,request};
@@ -20,3 +20,5 @@ test('La actualización elimina solo las cachés de esta subcarpeta',async()=>{c
 test('La navegación utiliza el HTML de la misma versión que los módulos y funciona sin conexión',async()=>{const online=runtime({online:true});await online.lifecycle('install');assert.equal((await online.request('','navigate')).url,'./index.html');assert.equal(online.fetches,0);const offline=runtime();await offline.lifecycle('install');assert.equal((await offline.request('','navigate')).url,'./index.html');});
 test('Al activar una versión nueva no se interrumpe una partida abierta',async()=>{const r=runtime();await r.lifecycle('install');await r.lifecycle('activate');assert.deepEqual(r.navigated,[]);});
 test('No intercepta páginas ajenas ni peticiones de escritura',async()=>{const r=runtime();await r.lifecycle('install');assert.equal(await r.request('otra-pagina','navigate'),null);assert.equal(await r.request('js/app.js','cors','POST'),null);assert.equal(await r.request('archivo-desconocido.png'),null);});
+
+test('La actualización descarga recursos frescos sin reutilizar la caché HTTP antigua',async()=>{const r=runtime();await r.lifecycle('install');assert.ok(r.lifecycleState.reloadRequests>20);});

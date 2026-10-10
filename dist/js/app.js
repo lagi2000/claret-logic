@@ -1,4 +1,5 @@
 import {levels} from './levels.js';
+import {bindBoardGestures} from './gestures.js';
 import {tutorials} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
 import {nextHint} from './pedagogy.js';
@@ -19,6 +20,7 @@ function cleanRound(s){const n=levels[s.index].size;s.round.marks=Object.fromEnt
 cleanRound(state);
 const screens={start:$('#start'),map:$('#worldMap'),game:$('#game')};
 function showScreen(name){
+  cancelGesture?.();
   for(const [key,screen] of Object.entries(screens)){
     const active=key===name;screen.hidden=!active;
     if(active)screen.removeAttribute('inert');else screen.setAttribute('inert','');
@@ -107,7 +109,8 @@ function drawBoard(){
     if(v==='c'){const img=document.createElement('img');img.src='./assets/claret.jpeg';img.alt='';b.append(img);}
     else if(isX){const cross=document.createElement('span');cross.className='cross';cross.textContent='×';cross.setAttribute('aria-hidden','true');b.append(cross);}
     // Native click covers taps, mouse and keyboard without firing on a swipe.
-    b.onclick=()=>safeMark(k);b.onkeydown=e=>{
+    b.onclick=e=>{if(e.detail===0)safeMark(k);};b.onkeydown=e=>{
+      if(e.key.toLowerCase()==='x'||e.key.toLowerCase()==='c'){e.preventDefault();setTool(e.key.toLowerCase());safeMark(k);return;}
       let target=k;if(e.key==='ArrowLeft')target=Math.max(r*n,k-1);else if(e.key==='ArrowRight')target=Math.min(r*n+n-1,k+1);else if(e.key==='ArrowUp')target=Math.max(0,k-n);else if(e.key==='ArrowDown')target=Math.min(n*n-1,k+n);else if(e.key==='Home')target=r*n;else if(e.key==='End')target=r*n+n-1;else return;
       e.preventDefault();focusCell=target;board.querySelectorAll('button').forEach(cell=>cell.tabIndex=Number(cell.dataset.cell)===target?0:-1);board.querySelector(`[data-cell="${target}"]`).focus();
     };board.append(b);
@@ -137,7 +140,18 @@ function mark(k){
   const missionMoment=mission?.type==='intruder'&&k===mission.intruder&&!marks[k]?'¡Intruso localizado! Ahora completa el tablero.':!logicalBefore&&logicalAfter?'¡Primera deducción conseguida! Continúa con el tablero.':'';
   if(missionMoment)react('spark','¡Buena deducción!');
   message(missionMoment|| (tool==='c'?(practice?'Hipótesis actualizada. Revisa sus consecuencias.':'Claret colocado. Ahora decide tus descartes.'):'Descarte actualizado.'),missionMoment?'success':'');play(missionMoment?'logical':tool==='c'?'place':'x',state.sound);haptic();
+  if(tool==='c'&&marks[k]==='c'){
+    const result=diagnose(L,marks);
+    if(result.ok)check();
+    else if(result.cells?.length){highlights=result.cells;drawBoard();message(result.message,'error');play('error',state.sound);}
+  }
 }
+const cancelGesture=bindBoardGestures(board,{
+  size:()=>level().size,enabled:()=>!screens.game.hidden&&!current().round.solved&&!document.querySelector('dialog[open]'),
+  read:k=>current().round.marks[k],
+  write:(k,value)=>{if((current().round.marks[k]??null)===value)return;setTool('x');safeMark(k);},
+  place:k=>{setTool('c');safeMark(k);}
+});
 function safeMark(k){
   try{mark(k);}
   catch(error){console.error('No se pudo registrar la jugada',error);repairActiveScreen();drawBoard();message('No se pudo registrar ese toque. Inténtalo de nuevo.','error');}
@@ -169,6 +183,7 @@ function showHint(){
     s.round.marks[h.target]=h.type==='place'?'c':'x';highlights=[h.target];$('#hintText').textContent=h.reason+' He realizado solo ese paso.';pendingHint=null;
   }
   $('#hintText').hidden=false;persist();drawBoard();play('place',state.sound);
+  if(diagnose(L,s.round.marks).ok)check();
 }
 function check(){
   const s=current();if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}
@@ -195,7 +210,7 @@ function startGame(){
   showScreen('game');repairActiveScreen();
   // The map changes state.index without keeping a game screen mounted. Always
   // rebuild here so the selected node cannot reuse the previous board's DOM.
-  redraw();$('#toolClaret').focus();
+  redraw();board.focus();
   if(!practice&&state.index%10===0&&!state.seenWorlds.includes(worldIndexForLevel(state.index)))openWorldIntro();
   else{react('ready','¡Vamos a pensar!');queueMissionIntro();}
 }
@@ -219,7 +234,7 @@ function openDaily(automatic=false){
 }
 function closeDaily(resume=true){
   const wasOpen=$('#daily').open;if(wasOpen)$('#daily').close();$('#dailyBackdrop').hidden=true;repairActiveScreen();
-  const target=dailyReturnFocus?.isConnected?dailyReturnFocus:$('#levelNodes .current,#play,#toolClaret');
+  const target=dailyReturnFocus?.isConnected?dailyReturnFocus:$('#levelNodes .current,#play,#board');
   if(wasOpen)target?.focus?.({preventScroll:true});dailyReturnFocus=null;
   if(resume&&!$('#game').hidden&&!$('#worldIntro').open)queueMissionIntro();
 }
@@ -345,10 +360,10 @@ function continueAchievement(){if(pendingAchievement===null)return;const finishe
   $('#achievement').close();pendingAchievement=null;shareCardPromise=null;if(!finished)nextLevel(state);persist();openMap(finished?9:worldIndexForLevel(state.index));}
 $('#achievementContinue').onclick=continueAchievement;
 $('#achievement').addEventListener('cancel',e=>{e.preventDefault();continueAchievement();});
-function continueWorldIntro(){const world=worldIndexForLevel(state.index);if(!state.seenWorlds.includes(world))state.seenWorlds.push(world);persist();$('#worldIntro').close();repairActiveScreen();react('ready','¡Comienza el viaje!');$('#toolClaret').focus();queueMissionIntro();}
+function continueWorldIntro(){const world=worldIndexForLevel(state.index);if(!state.seenWorlds.includes(world))state.seenWorlds.push(world);persist();$('#worldIntro').close();repairActiveScreen();react('ready','¡Comienza el viaje!');board.focus();queueMissionIntro();}
 $('#worldIntroContinue').onclick=continueWorldIntro;
 $('#worldIntro').addEventListener('cancel',e=>{e.preventDefault();continueWorldIntro();});
-function continueMissionIntro(){$('#missionIntro').close();repairActiveScreen();$('#toolClaret').focus();}
+function continueMissionIntro(){$('#missionIntro').close();repairActiveScreen();board.focus();}
 $('#missionIntroContinue').onclick=continueMissionIntro;
 $('#missionIntro').addEventListener('cancel',e=>{e.preventDefault();continueMissionIntro();});
 $('#how').onclick=()=>$('#rules').showModal();$('#help').onclick=()=>$('#rules').showModal();
@@ -377,7 +392,13 @@ document.addEventListener('visibilitychange',()=>{if(document.visibilityState===
 window.addEventListener('pageshow',()=>{if($('#daily').open)closeDaily(false);repairActiveScreen();});
 // Keep the current board and dialogs intact while a new offline version installs.
 // Fresh files are loaded the next time the player opens the game.
-if('serviceWorker' in navigator){navigator.serviceWorker.register('./sw.js').then(registration=>registration.update()).catch(()=>{ /* Online play remains available. */ });}
+if('serviceWorker' in navigator){
+  const wasControlled=Boolean(navigator.serviceWorker.controller);
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{if(wasControlled)$('#updateNotice').hidden=false;});
+  $('#applyUpdate').onclick=()=>{persist();location.reload();};
+  $('#dismissUpdate').onclick=()=>{$('#updateNotice').hidden=true;};
+  navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).then(registration=>registration.update()).catch(()=>{ /* Online play remains available. */ });
+}
 repairActiveScreen();redraw();$('#play').focus();
 
 // Fixed teaching diagrams: examples illustrate one rule, not puzzle solutions.

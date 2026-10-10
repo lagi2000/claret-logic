@@ -192,3 +192,16 @@ dialog:not([open]){display:none!important}
 .achievement,.world-intro{overflow-y:auto;overscroll-behavior:contain}
 .achievement{max-height:calc(100svh - max(28px,env(safe-area-inset-top)) - max(28px,env(safe-area-inset-bottom)))}
 .world-intro{max-height:calc(100svh - max(20px,env(safe-area-inset-top)) - max(20px,env(safe-area-inset-bottom)))}
+
+/* Direct puzzle controls: the board is the primary touch surface. */
+.board{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.play .tools{display:none}
+.board .cell{touch-action:none}.board .cell img{pointer-events:none;-webkit-user-drag:none}
+.board .cell .cross{font-size:clamp(24px,6vw,48px);font-weight:900;line-height:1;color:#294a67;opacity:.8;animation:none;pointer-events:none}
+.gesture-guide{font-size:.8rem;text-align:center;margin:5px 0 8px;color:#47637a}.gesture-guide b{color:#17385c}
+.mini-rules{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:7px}.mini-rules span{padding:6px 4px;background:#e8f1f8;border-radius:8px;text-align:center;font-size:.68rem;font-weight:750;line-height:1.2}
+.tools{max-width:300px;margin:0 auto;background:transparent;box-shadow:none;border:0}.tools button{font-size:.75rem;padding:4px 9px;min-height:44px}.tools button img{width:22px;height:22px}.tools button span{font-size:1rem}
+.gamehead{margin-top:10px}.status{margin-top:6px;margin-bottom:8px}
+@media(max-width:559px){.topbar .brand strong{font-size:1rem}.rank{padding:7px 10px}.rank strong{font-size:.88rem}.rank .eyebrow{font-size:.6rem}.topbar{padding-bottom:7px}.hud h1{font-size:1.45rem}.play{padding:10px}.app{padding-left:10px;padding-right:10px}.tools{max-width:260px}.gesture-guide{margin:2px 0 5px;font-size:.74rem}}
+
+.release-label{display:block;margin:8px auto;color:#c9dced;font-size:.72rem;text-align:center}.release-label a{color:inherit;text-underline-offset:3px}.update-notice{position:fixed;z-index:1000;inset:auto 12px max(12px,env(safe-area-inset-bottom));margin:auto;max-width:620px;padding:12px;border:2px solid #fff;border-radius:18px;background:#17385c;color:white;box-shadow:0 6px 24px #0005;font-size:.9rem}.update-notice button{margin:6px 4px 0 0;background:#fff;color:#17385c;min-height:44px}

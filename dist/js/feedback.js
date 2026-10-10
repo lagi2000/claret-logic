@@ -1,4 +1,4 @@
-let context;
+let context,lastTick=0;
 const patterns={
   place:{notes:[440],wave:'sine',gain:.035,step:.08},
   x:{notes:[300],wave:'triangle',gain:.025,step:.08},
@@ -10,6 +10,7 @@ const patterns={
 };
 export function play(kind,enabled=true) {
   if(!enabled)return;
+  if(kind==='x'){const t=performance.now();if(t-lastTick<65)return;lastTick=t;}
   try {
     const Audio=window.AudioContext||window.webkitAudioContext;if(!Audio)return;
     context??=new Audio();if(context.state==='suspended')void context.resume().catch(()=>{});
