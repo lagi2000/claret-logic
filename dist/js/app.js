@@ -3,7 +3,7 @@ import {bindBoardGestures} from './gestures.js';
 import {tutorials} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
 import {nextHint} from './pedagogy.js';
-import {KEY,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
+import {KEY,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
 import {fittedBoardSize} from './layout.js';
@@ -12,11 +12,11 @@ import {missionFor,seedMission,missionGate,missionProgress} from './missions.js'
 const $=s=>document.querySelector(s), board=$('#board'), cloneRound=value=>typeof structuredClone==='function'?structuredClone(value):JSON.parse(JSON.stringify(value));
 let storage;try{storage=window.localStorage;}catch{}
 const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null,reactionTimer=0,rewardTimer=0,rewardHideTimer=0,dailyReturnFocus=null,dailyTimer=0,installPrompt=null,installReturnFocus=null,shareCardPromise=null;
-const palette=['#ffc8d9','#bde9d2','#bfe2ff','#ffe69b','#d9c8ff','#ffd5ad','#bdeef0'];
+const palette=['#ffc8d9','#bde9d2','#bfe2ff','#ffe69b','#d9c8ff','#ffd5ad','#66c9c3','#b7c576','#94a9dd','#dea5bc'];
 const introducedMissions=new Set(),ambientSymbols=['✦','❋','○','◇','≈','•','✧','❋','◆','✦'];
 const current=()=>practice??state, level=()=>practice?tutorials[practice.index]:levels[state.index];
 function persist(){if(practice&&onboarding){state.tutorialIndex=practice.index;state.tutorialRound=cloneRound(practice.round);}if(!save(storage,state))$('#storageWarning').hidden=false;}
-function cleanRound(s){const n=levels[s.index].size;s.round.marks=Object.fromEntries(Object.entries(s.round.marks).filter(([k])=>+k<n*n));if(s.round.solved&&!diagnose(levels[s.index],s.round.marks).ok)s.round.solved=false;}
+function cleanRound(s){upgradeCampaign(s,levels);const n=levels[s.index].size;s.round.marks=Object.fromEntries(Object.entries(s.round.marks).filter(([k])=>+k<n*n));if(s.round.solved&&!diagnose(levels[s.index],s.round.marks).ok)s.round.solved=false;}
 cleanRound(state);
 const screens={start:$('#start'),map:$('#worldMap'),game:$('#game')};
 function showScreen(name){
@@ -439,7 +439,7 @@ function scheduleFit(){cancelAnimationFrame(fitFrame);fitFrame=requestAnimationF
  const contentHeight=Math.max(0,Math.max(top.bottom,...visibleBottoms)-top.top);
  const playStyle=getComputedStyle($('.play'));
  const maxWidth=$('.play').clientWidth-parseFloat(playStyle.paddingLeft)-parseFloat(playStyle.paddingRight);
- const size=fittedBoardSize({viewport,contentHeight,boardSize:square.height,maxWidth,air:20});
+ const size=fittedBoardSize({viewport,contentHeight,boardSize:square.height,maxWidth,air:20,min:Math.max(168,level().size*30)});
  if(Math.abs(square.width-size)>1)board.style.width=size+'px';
  });}
 new ResizeObserver(scheduleFit).observe($('#game'));

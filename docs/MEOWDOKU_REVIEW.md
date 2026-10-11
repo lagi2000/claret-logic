@@ -1,4 +1,4 @@
-# Controles directos · 3.7.0
+# Controles directos y campaña ampliada · 3.8.0
 
 Referencias revisadas: los dos vídeos aportados (95 y 112 segundos), incluyendo los niveles iniciales y el nivel 48; ficha oficial de Oakever Games en Google Play, https://play.google.com/store/apps/details?id=com.oakever.meowdoku (10 de octubre de 2026).
 
@@ -9,7 +9,9 @@ Referencias revisadas: los dos vídeos aportados (95 y 112 segundos), incluyendo
 - Resolución automática por cumplimiento de las tres reglas, independientemente del orden de las jugadas. No se exige usar una primera deducción predeterminada.
 - Feedback inmediato ante conflictos entre figuras. Los descartes siguen siendo notas del jugador, sin penalizaciones por hipótesis. Las vidas mantienen su funcionamiento aprobado.
 - Cabecera compacta, recordatorio de las tres reglas y cruces más grandes. La identidad, las ilustraciones y los diez destinos pertenecen a Claret Logic.
-- Dificultad: se conserva la campaña certificada de 4×4 a 7×7. El nivel 48 del vídeo es más denso; esta entrega no reproduce ese tamaño ni sus tableros. Un salto a 10×10 necesitaría una nueva curva validada y revisión táctil específica.
+- Dificultad: nuevas regiones originales, de 4×4 a 9×9 en los diez primeros retos (nivel 9: 9×9), alternancia 8×8/9×9 hasta el 30 y 9×9/10×10 después. Los tableros de cada tamaño se ordenan por complejidad de deducción. No se copian tableros de Meowdoku. La comparación de dificultad es orientativa, no una equivalencia demostrada mediante pruebas con jugadores.
+- Migración: conserva niveles superados, rangos, racha y ayudas. Reinicia únicamente la cuadrícula en curso, porque sus regiones han cambiado. Las partidas de la nueva campaña sí se recuperan completas.
+- Paleta de diez regiones y mínimo táctil de 30 px por casilla cuando el ancho disponible lo permite. En pantallas excepcionalmente bajas se permite desplazamiento antes que reducir las casillas a un tamaño inutilizable.
 - No se añaden anuncios, compras ni puntuaciones arbitrarias.
 
 ## Verificación

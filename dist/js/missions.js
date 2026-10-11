@@ -5,7 +5,13 @@ import {worlds} from './worlds.js';
 const missionType=index=>({2:'started',4:'logical',6:'intruder',9:'boss'})[index%10]??'classic';
 const positions=L=>L.solution.map((column,row)=>row*L.size+column);
 
+const missionCache=new WeakMap();
 export function missionFor(index,L){
+  let cache=missionCache.get(L);if(!cache){cache=new Map();missionCache.set(L,cache);}
+  if(!cache.has(index))cache.set(index,createMission(index,L));
+  return cache.get(index);
+}
+function createMission(index,L){
   const type=missionType(index),world=worlds[Math.floor(index/10)];
   if(type==='classic')return null;
   if(type==='started'){

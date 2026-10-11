@@ -1,3 +1,11 @@
+## 3.8.0 · Campaña ampliada y gestos directos
+
+- Toque/arrastre para descartes, doble toque para Claret y final automático por las tres normas.
+- 100 tableros originales 4×4–10×10, con solución única y prueba deductiva; nivel 9 de 9×9.
+- Diez colores, tamaño mínimo de casilla, cálculo de misiones reutilizado y guardado de hasta cien casillas.
+- Migración preserva progreso, ayudas, rangos y racha. Descarta solamente marcas de la antigua cuadrícula.
+- 174 pruebas automáticas y certificación de los 102 tableros, incluidos los tutoriales.
+
 ## 3.6.1 · Actualización visible
 
 - La instalación PWA descarga recursos frescos; aviso de actualización sin interrumpir la partida.

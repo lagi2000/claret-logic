@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {levels} from '../dist/js/levels.js';
+import {regressionBoards} from './regression-boards.js';
 import {conflictRules,diagnose} from '../dist/js/engine.js';
 import {safeDeductions} from '../dist/js/pedagogy.js';
 import {missionFor,seedMission,missionGate,missionProgress} from '../dist/js/missions.js';
@@ -40,14 +41,14 @@ test('La jugada lógica acepta todas las primeras deducciones seguras y nunca bl
 });
 
 test('El reto 5 admite tanto la casilla rosa como la azul como primeras deducciones',()=>{
-  const L=levels[4],mission=missionFor(4,L);
+  const L=regressionBoards[0],mission=missionFor(4,L);
   const placements=mission.validMoves.filter(move=>move.tool==='c').map(move=>move.cell);
   assert.ok(placements.includes(3));
   assert.ok(placements.includes(12));
 });
 
 test('El reto 15 ofrece varias exclusiones seguras y selecciona Descartar sin bloquear otras jugadas',()=>{
-  const L=levels[14],mission=missionFor(14,L);
+  const L=regressionBoards[1],mission=missionFor(14,L);
   assert.equal(mission.preferredTool,'x');
   assert.ok(mission.validMoves.filter(move=>move.tool==='x').length>1);
   for(let cell=0;cell<L.size**2;cell++)assert.equal(missionGate(mission,{},'c',cell),null);
@@ -71,7 +72,8 @@ test('Detecta al intruso presenta un conflicto real y conserva una guía correct
     assert.ok(!solutionCells(L).includes(mission.intruder));
     assert.ok(conflictRules(L,mission.fixed[0],mission.intruder).length>0);
     assert.equal(diagnose(L,round.marks).conflict,true);
-    assert.match(missionGate(mission,round.marks,'x',0),/intruso/);
+    const other=Array.from({length:L.size**2},(_,k)=>k).find(k=>!mission.fixed.includes(k)&&k!==mission.intruder);
+    assert.match(missionGate(mission,round.marks,'x',other),/intruso/);
     assert.equal(missionGate(mission,round.marks,'c',mission.intruder),null);
     delete round.marks[mission.intruder];
     assert.equal(diagnose(L,round.marks).conflict,undefined);

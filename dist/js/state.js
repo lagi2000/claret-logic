@@ -1,10 +1,20 @@
 export const KEY='claretLogic.v4';
+export const CAMPAIGN_REVISION=20261011;
+export function upgradeCampaign(s,levels){
+  if(s.campaignRevision===CAMPAIGN_REVISION)return false;
+  s.campaignRevision=CAMPAIGN_REVISION;
+  s.index=Math.min(99,Math.max(s.index,s.completed));
+  s.round=fresh().round;
+  if(s.completed===100){s.round.marks=Object.fromEntries(levels[99].solution.map((c,r)=>[r*levels[99].size+c,'c']));s.round.solved=true;}
+  return true;
+}
 export const ranks=['Explorador','Aprendiz','Observador','Estratega','Experto','Maestro','Mente brillante','Genio lógico','Gran estratega','Mente Claret'];
 const integer=(v,min,max,fallback)=>Number.isInteger(v)&&v>=min&&v<=max?v:fallback;
 const clone=value=>typeof globalThis.structuredClone==='function'?globalThis.structuredClone(value):JSON.parse(JSON.stringify(value));
-export function fresh(){return {version:4,tutorialRevision:2,tutorialDone:false,tutorialIndex:0,tutorialRound:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false},index:0,completed:0,helps:3,streak:0,sound:true,daily:{last:'',current:0,best:0},seenWorlds:[],celebratedWorlds:[],round:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false}};}
+export function fresh(){return {version:4,campaignRevision:CAMPAIGN_REVISION,tutorialRevision:2,tutorialDone:false,tutorialIndex:0,tutorialRound:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false},index:0,completed:0,helps:3,streak:0,sound:true,daily:{last:'',current:0,best:0},seenWorlds:[],celebratedWorlds:[],round:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false}};}
 export function normalize(raw) {
   const s=fresh();if(!raw||typeof raw!=='object')return s;
+  s.campaignRevision=integer(raw.campaignRevision,0,CAMPAIGN_REVISION,0);
   s.tutorialDone=raw.tutorialDone===true;s.tutorialIndex=integer(raw.tutorialIndex,0,1,0);
   if(raw.tutorialRevision===2&&raw.tutorialRound&&typeof raw.tutorialRound==='object'){
     const t=raw.tutorialRound;
@@ -17,7 +27,7 @@ export function normalize(raw) {
   s.seenWorlds=Array.isArray(raw.seenWorlds)?[...new Set(raw.seenWorlds.filter(value=>Number.isInteger(value)&&value>=0&&value<10))]:[];
   s.celebratedWorlds=Array.isArray(raw.celebratedWorlds)?[...new Set(raw.celebratedWorlds.filter(value=>Number.isInteger(value)&&value>=0&&value<10&&raw.completed>=(value+1)*10))]:[];
   const round=raw.round;
-  if(round&&typeof round==='object')s.round={marks:Object.fromEntries(Object.entries(round.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<49&&['c','x'].includes(v))),lives:integer(round.lives,1,3,3),usedHelp:round.usedHelp===true,helpStep:integer(round.helpStep,0,2,0),solved:round.solved===true};
+  if(round&&typeof round==='object')s.round={marks:Object.fromEntries(Object.entries(round.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<100&&['c','x'].includes(v))),lives:integer(round.lives,1,3,3),usedHelp:round.usedHelp===true,helpStep:integer(round.helpStep,0,2,0),solved:round.solved===true};
   return s;
 }
 export function load(storage) {
