@@ -3,7 +3,7 @@ import {bindBoardGestures} from './gestures.js';
 import {tutorials} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
 import {nextHint} from './pedagogy.js';
-import {KEY,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
+import {KEY,attemptClaret,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
 import {fittedBoardSize} from './layout.js';
@@ -84,10 +84,10 @@ function stats(){
   $('#missionProgress').hidden=!mission;$('#missionProgress').textContent=mission?missionProgress(mission,s.round.marks):'';
   $('.play').dataset.mission=mission?.type??'classic';
   $('#boardNote').textContent=practice?'Al colocar a Claret verás las consecuencias de tu elección.':'Las cruces solo aparecen cuando tú las colocas.';
-  const milestone=!practice&&s.round.solved&&(s.index+1)%10===0;
+  const milestone=!practice&&s.round.solved&&(s.index+1)%10===0&&!s.celebratedWorlds.includes(Math.floor(s.index/10));
   $('#check').textContent=s.round.solved?solvedActionLabel({practice,index:s.index,onboarding,milestone}):'Comprobar';
-  $('#check').disabled=false;
-  $('#reset').disabled=s.round.solved;$('#hint').disabled=s.round.solved||(!practice&&s.helps===0);
+  $('#check').disabled=false;$('#gameResults').textContent=`Victorias ${state.victories} · Derrotas ${state.defeats}`;if(s.round.lives===0)$('#check').textContent='Reintentar nivel';
+  $('#reset').disabled=s.round.solved||s.round.lives>0;$('#hint').disabled=s.round.solved||s.round.lives===0||(!practice&&s.helps===0);
   $('#leavePractice').hidden=!practice||onboarding;
   $('#sound').setAttribute('aria-pressed',String(state.sound));$('#sound').setAttribute('aria-label',state.sound?'Desactivar sonido':'Activar sonido');$('#sound').textContent=state.sound?'♪':'♪̸';
   document.querySelectorAll('.daily-button').forEach(button=>button.classList.toggle('due',state.daily.last<dateKey()));
@@ -98,13 +98,13 @@ function drawBoard(){
   const s=current(),L=level(),n=L.size,mission=practice?null:missionFor(s.index,L),auto=practice?autoMarks(L,s.round.marks):new Set();
   board.replaceChildren();board.style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;board.style.gridTemplateRows=`repeat(${n},minmax(0,1fr))`;board.setAttribute('aria-label',`Tablero de ${n} filas y ${n} columnas`);
   for(let k=0;k<n*n;k++) {
-    const r=Math.floor(k/n),c=k%n,region=L.regions[r][c],v=s.round.marks[k],isX=v!=='c'&&(v==='x'||auto.has(k));
+    const r=Math.floor(k/n),c=k%n,region=L.regions[r][c],v=s.round.marks[k],isX=v!=='c'&&(v==='x'||v==='e'||auto.has(k));
     const b=document.createElement('button');b.type='button';b.className='cell';b.dataset.cell=k;b.tabIndex=k===focusCell?0:-1;
     b.style.backgroundColor=palette[region];
     if(r>0&&L.regions[r-1][c]!==region)b.style.borderTop='3px solid #17385c';
     if(c>0&&L.regions[r][c-1]!==region)b.style.borderLeft='3px solid #17385c';
-    b.classList.toggle('auto',isX&&v!=='x');b.classList.toggle('hi',highlights.includes(k));b.classList.toggle('fixed',Boolean(mission?.fixed?.includes(k)));
-    b.setAttribute('aria-label',`Fila ${r+1}, columna ${c+1}, región ${region+1}: ${v==='c'?(mission?.fixed?.includes(k)?'Claret guía':'Claret'):isX?(v==='x'?'descarte manual':'descarte automático'):'vacía'}`);
+    b.classList.toggle('failed',v==='e');b.classList.toggle('auto',isX&&v!=='x'&&v!=='e');b.classList.toggle('hi',highlights.includes(k));b.classList.toggle('fixed',Boolean(mission?.fixed?.includes(k)));
+    b.setAttribute('aria-label',`Fila ${r+1}, columna ${c+1}, región ${region+1}: ${v==='c'?(mission?.fixed?.includes(k)?'Claret guía':'Claret'):isX?(v==='e'?'fallo, descarte fijo':v==='x'?'descarte manual':'descarte automático'):'vacía'}`);
     b.setAttribute('aria-pressed',String(v==='c'));b.setAttribute('aria-disabled',String(s.round.solved));
     if(v==='c'){const img=document.createElement('img');img.src='./assets/claret.jpeg';img.alt='';b.append(img);}
     else if(isX){const cross=document.createElement('span');cross.className='cross';cross.textContent='×';cross.setAttribute('aria-hidden','true');b.append(cross);}
@@ -123,17 +123,26 @@ function redraw(){
   const mission=practice?null:missionFor(s.index,level());
   if(mission?.type==='logical'&&!Object.keys(s.round.marks).length&&mission.preferredTool)tool=mission.preferredTool;
   drawBoard();setTool(tool);
-  message(s.round.solved?'¡Reto superado! Puedes continuar.':mission?.type==='intruder'?'Compara los dos Claret. Uno de ellos rompe una norma.':mission?.type==='logical'?'Busca primero una deducción completamente segura.':'Elige una casilla para empezar.',s.round.solved?'success':'');
+  message(s.round.lives===0?'Has perdido este intento. Reintenta el mismo nivel con tres vidas.':s.round.solved?'¡Reto superado! Puedes continuar.':mission?.type==='intruder'?'Compara los dos Claret. Uno de ellos rompe una norma.':mission?.type==='logical'?'Busca primero una deducción completamente segura.':'Elige una casilla para empezar.',s.round.solved?'success':'');
   if(s.round.solved)victoryMessage();
 }
 function mark(k){
-  const s=current();if(s.round.solved)return;
+  const s=current();if(s.round.solved||s.round.lives===0)return;
   focusCell=k;const marks=s.round.marks,L=level(),mission=practice?null:missionFor(s.index,L),gate=missionGate(mission,marks,tool,k),auto=practice?autoMarks(L,marks):new Set();
+  if(marks[k]==='e'){message('Esta casilla ya está descartada por un fallo.');return;}
   const logicalBefore=mission?.type==='logical'&&missionProgress(mission,marks)==='Primera deducción conseguida';
   if(gate){highlights=mission?.type==='intruder'?[...mission.fixed,mission.intruder]:mission?.fixed??[];drawBoard();message(gate,'error');react('worry','Revisa esa relación');play('error',state.sound);return;}
   if(tool==='x'&&marks[k]==='c'){message('Selecciona Claret para retirar esa figura.');react('worry','Primero cambia de herramienta');return;}
   if(tool==='x'&&auto.has(k)&&marks[k]!=='x'){message('Esta X depende de tu hipótesis. Retira el Claret que la provoca para revisarla.');react('think','Revisa tu hipótesis');return;}
-  if(marks[k]===tool)delete marks[k];else marks[k]=tool;
+  if(tool==='c'){
+    const outcome=attemptClaret(s,L,k);
+    if(outcome==='error'||outcome==='lost'){
+      pendingHint=null;highlights=[];persist();drawBoard();
+      message(outcome==='lost'?'Has agotado las tres vidas. Reintenta este nivel.':`Esa casilla no admite Claret. Queda descartada. Te quedan ${s.round.lives} vidas.`,'error');
+      react('worry',outcome==='lost'?'¡Puedes volver a intentarlo!':'Una pista para continuar');play('error',state.sound);haptic();
+      if(outcome==='lost')$('#check').focus({preventScroll:true});return;
+    }
+  }else if(marks[k]===tool)delete marks[k];else marks[k]=tool;
   highlights=[];pendingHint=null;s.round.helpStep=0;$('#hintText').hidden=true;
   persist();drawBoard();const cell=board.querySelector(`[data-cell="${k}"]`);cell.focus({preventScroll:true});if(tool==='c'&&marks[k]==='c'){cell.classList.add('selected');pulseConsequences(k,L);react('think','Veamos qué implica…');}
   const logicalAfter=mission?.type==='logical'&&missionProgress(mission,marks)==='Primera deducción conseguida';
@@ -147,7 +156,7 @@ function mark(k){
   }
 }
 const cancelGesture=bindBoardGestures(board,{
-  size:()=>level().size,enabled:()=>!screens.game.hidden&&!current().round.solved&&!document.querySelector('dialog[open]'),
+  size:()=>level().size,enabled:()=>!screens.game.hidden&&!current().round.solved&&current().round.lives>0&&!document.querySelector('dialog[open]'),
   read:k=>current().round.marks[k],
   write:(k,value)=>{if((current().round.marks[k]??null)===value)return;setTool('x');safeMark(k);},
   place:k=>{setTool('c');safeMark(k);}
@@ -158,7 +167,7 @@ function safeMark(k){
 }
 function setTool(value){tool=value;$('#toolClaret').setAttribute('aria-pressed',String(value==='c'));$('#toolX').setAttribute('aria-pressed',String(value==='x'));}
 function showHint(){
-  const s=current(),L=level();if(s.round.solved)return;
+  const s=current(),L=level();if(s.round.solved||s.round.lives===0)return;
   let h=pendingHint;
   if(!h){
     h=nextHint(L,s.round.marks);
@@ -186,14 +195,15 @@ function showHint(){
   if(diagnose(L,s.round.marks).ok)check();
 }
 function check(){
-  const s=current();if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}
+  const s=current();if(s.round.lives===0){retryLevel();return;}if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}
+    if(s.index+1<s.completed||(s.index+1===s.completed&&s.celebratedWorlds.includes(Math.floor(s.index/10)))){s.index=Math.min(99,s.completed);s.round=fresh().round;if(s.completed===100){s.round.marks=Object.fromEntries(levels[99].solution.map((c,r)=>[r*levels[99].size+c,'c']));s.round.solved=true;}persist();openMap();return;}
     if(journeyStatus(state).kind==='achievement'){pendingAchievement=worldIndexForLevel(state.index);openAchievement();return;}
     if(nextLevel(s))persist();openMap();return;}
   const result=diagnose(level(),s.round.marks);highlights=result.cells;
   if(result.ok){
     const helpsBefore=s.helps;
     if(practice)s.round.solved=true;else complete(s);persist();drawBoard();
-    const milestone=!practice&&(s.index+1)%10===0,recoveredHelp=!practice&&s.helps>helpsBefore;
+    const milestone=!practice&&(s.index+1)%10===0&&!s.celebratedWorlds.includes(Math.floor(s.index/10)),recoveredHelp=!practice&&s.helps>helpsBefore;
     if(recoveredHelp)reward('15 retos sin ayuda · Recuperas una ayuda');
     else if(!practice&&s.streak>0&&s.streak%3===0)reward(`${s.streak} retos sin ayuda · ¡Mente despierta!`);
     message(practice?'¡Correcto! Práctica completada.':s.index===99?'¡Has completado Claret Logic! Tu rango es Mente Claret.':milestone?`¡Reto superado! Nuevo rango: ${earnedRank(s.completed)}.`:'¡Correcto! Reto superado.','success');
@@ -261,13 +271,13 @@ function drawMap(){
   $('#routeLine').setAttribute('points',routePoints.map(p=>p.join(',')).join(' '));
   const nodes=$('#levelNodes');nodes.replaceChildren();
   routePoints.forEach(([x,y],i)=>{
-    const number=start+i+1,done=number<=state.completed,current=number===state.index+1&&state.completed<100,available=mapWorld<=unlocked&&(done||current);
-    const mission=missionFor(number-1,levels[number-1]),b=document.createElement('button');b.type='button';b.className='levelnode';b.style.left=x+'%';b.style.top=y+'%';b.textContent=done?'✓':number;b.dataset.level=number;
-    b.classList.toggle('done',done);b.classList.toggle('current',current);b.classList.toggle('locked',!available);b.disabled=!current;
+    const number=start+i+1,done=number<=state.completed,current=number===state.completed+1&&state.completed<100,available=mapWorld<=unlocked&&(done||current);
+    const mission=missionFor(number-1,levels[number-1]),b=document.createElement('button');b.type='button';b.className='levelnode';b.style.left=x+'%';b.style.top=y+'%';b.textContent=number;if(state.stars[number-1]){const stars=document.createElement('span');stars.className='node-stars';stars.textContent='★'.repeat(state.stars[number-1]);b.append(stars);}b.dataset.level=number;
+    b.classList.toggle('done',done);b.classList.toggle('current',current);b.classList.toggle('locked',!available);b.disabled=!available;
     if(mission){b.classList.add('mission-node');b.dataset.mission=mission.symbol;}
     const missionName=mission?`, misión ${mission.short}`:'';
-    b.setAttribute('aria-label',done?`Reto ${number}${missionName}, superado`:current?`Reto ${number}${missionName}, continuar`:`Reto ${number}${missionName}, bloqueado`);
-    if(current)b.onclick=startGame;nodes.append(b);
+    b.setAttribute('aria-label',done?`Reto ${number}${missionName}, superado${state.stars[number-1]?`, ${state.stars[number-1]} estrellas`:''}`:current?`Reto ${number}${missionName}, continuar`:`Reto ${number}${missionName}, bloqueado`);
+    if(available)b.onclick=()=>{if(number!==state.index+1||state.round.solved){state.index=number-1;state.round=fresh().round;persist();}startGame();};nodes.append(b);
   });
   $('#previousWorld').disabled=mapWorld===0;$('#nextWorld').disabled=mapWorld>=unlocked||mapWorld===9;
   $('#worldDots').textContent=worlds.map((_,i)=>i===mapWorld?'●':i<=unlocked?'•':'·').join(' ');
@@ -370,7 +380,8 @@ $('#how').onclick=()=>$('#rules').showModal();$('#help').onclick=()=>$('#rules')
 $('[data-close="rules"]').onclick=()=>$('#rules').close();
 $('#tutorial').onclick=()=>{onboarding=!state.tutorialDone;practice=beginTutorial(state,!onboarding);redraw();startGame();};$('#leavePractice').onclick=leavePractice;
 $('#toolClaret').onclick=()=>setTool('c');$('#toolX').onclick=()=>setTool('x');$('#hint').onclick=showHint;$('#check').onclick=check;
-$('#reset').onclick=()=>{const s=current();if(!resetRound(s))return;persist();redraw();message(s.round.lives===3?'Has gastado las 3 vidas. Sigues en este reto con 3 vidas.':'Tablero reiniciado. Has gastado una vida.');play('error',state.sound);};
+function retryLevel(){if(!resetRound(current()))return;cancelGesture();persist();redraw();message('Nuevo intento: tres vidas. ¡Vamos a pensar!');board.focus();}
+$('#reset').onclick=retryLevel;
 $('#sound').onclick=()=>{state.sound=!state.sound;persist();stats();play('place',state.sound);};
 $('#heart').onclick=()=>{const previousBest=state.daily.best,result=activateDay(state);persist();renderDaily();stats();if(result.changed){$('#heart').classList.add('lit');$('#dailyMessage').textContent=result.reward?'Has recuperado una ayuda. ¡Racha encendida!':state.daily.best>previousBest&&previousBest>0?`¡Nuevo récord: ${state.daily.best} días! Vuelve mañana.`:'Racha encendida. Vuelve mañana para continuar.';play('heart',state.sound);haptic();$('#dailyContinue').focus();}};
 $('#dailyContinue').onclick=()=>closeDaily();

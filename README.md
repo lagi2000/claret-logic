@@ -1,4 +1,4 @@
-# Claret Logic · 3.8.0
+# Claret Logic · 3.9.0
 
 Controles directos: tocar o arrastrar marca cruces; arrastrar desde una cruz las borra; doble toque coloca o retira Claret. Teclado: flechas, C y X. Al resolver se comprueba automáticamente. Nueva campaña de 4×4 a 10×10, con 9×9 en el reto 9. La actualización conserva los logros y reinicia solo el tablero en curso de la campaña anterior, porque sus regiones han cambiado.
 

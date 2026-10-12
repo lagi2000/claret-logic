@@ -1,3 +1,11 @@
+## 3.9.0 · Vidas, errores y estrellas
+
+- Claret incorrecto pierde una vida y deja una cruz roja fija. Las notas normales no penalizan.
+- Tres errores terminan el intento; reintentar limpia solo ese nivel. Recargar no recupera vidas.
+- Contadores persistentes de victorias/derrotas de campaña; mejores estrellas por nivel (vidas restantes).
+- Mapa conserva números y permite repetir retos ya superados. No se inventan estrellas de partidas antiguas.
+- Verificados los 102 tableros y todas las posiciones correctas en cualquier orden, incluido el reto 16.
+
 ## 3.8.0 · Campaña ampliada y gestos directos
 
 - Toque/arrastre para descartes, doble toque para Claret y final automático por las tres normas.

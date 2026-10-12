@@ -38,7 +38,7 @@ export function safeDeductions(L, marks={}) {
   if(diagnosis.conflict)return [];
   const all=Array.from({length:L.size**2},(_,k)=>k);
   const placed=new Set(Object.keys(marks).filter(k=>marks[k]==='c').map(Number));
-  const candidates=new Set(all.filter(k=>!placed.has(k)&&marks[k]!=='x'&&[...placed].every(q=>!conflictRules(L,q,k).length)));
+  const candidates=new Set(all.filter(k=>!placed.has(k)&&!['x','e'].includes(marks[k])&&[...placed].every(q=>!conflictRules(L,q,k).length)));
   const open=groups(L).filter(g=>!g.cells.some(k=>placed.has(k))).map(g=>({...g,options:g.cells.filter(k=>candidates.has(k))}));
   const moves=new Map();
   const add=move=>moves.set(`${move.type}:${move.target}`,move);
@@ -62,7 +62,7 @@ export function nextHint(L, marks) {
   for(const step of deductions(L).trace) {
     if(step.type==='place' && marks[step.target]!=='c')return step;
     if(step.type==='exclude') {
-      const target=step.removed.find(k=>marks[k]!=='x');
+      const target=step.removed.find(k=>!['x','e'].includes(marks[k]));
       if(target!==undefined)return {...step,target};
     }
   }
