@@ -1,0 +1,2 @@
+import test from 'node:test';import assert from 'node:assert/strict';import {swipeDirection} from '../dist/js/map-swipe.js';
+test('Deslizar izquierda avanza y derecha retrocede; vertical y toques no cambian destino',()=>{assert.equal(swipeDirection(-110,10),1);assert.equal(swipeDirection(110,10),-1);assert.equal(swipeDirection(20,5),0);assert.equal(swipeDirection(70,100),0);assert.equal(swipeDirection(54,0),0);});

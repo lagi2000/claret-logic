@@ -1,5 +1,6 @@
 import {levels} from './levels.js';
 import {bindBoardGestures} from './gestures.js';
+import {bindMapSwipe} from './map-swipe.js';
 import {tutorials} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
 import {teachingHint,advanceLesson} from './teaching.js';
@@ -270,7 +271,7 @@ function drawMap(){
     b.setAttribute('aria-label',done?`Reto ${number}${missionName}, superado${state.stars[number-1]?`, ${state.stars[number-1]} estrellas`:''}`:current?`Reto ${number}${missionName}, continuar`:`Reto ${number}${missionName}, bloqueado`);
     if(available)b.onclick=()=>{if(number!==state.index+1||state.round.solved){state.index=number-1;state.round=fresh().round;persist();}startGame();};nodes.append(b);
   });
-  $('#previousWorld').disabled=mapWorld===0;$('#nextWorld').disabled=mapWorld>=unlocked||mapWorld===9;
+  $('#previousWorld').disabled=mapWorld===0;$('#nextWorld').disabled=mapWorld===9;
   $('#worldDots').textContent=worlds.map((_,i)=>i===mapWorld?'●':i<=unlocked?'•':'·').join(' ');
 }
 function openMap(index=worldIndexForLevel(state.completed>=100?99:state.index)){
@@ -290,11 +291,11 @@ function renderJourney(){
   const active=worldIndexForLevel(state.completed>=100?99:state.index),list=$('#journeyList');list.replaceChildren();
   worlds.forEach((W,i)=>{
     const done=state.completed>=(i+1)*10,current=i===active&&!done,locked=i>active,button=document.createElement('button');
-    button.type='button';button.className='journeycard';button.classList.toggle('done',done);button.classList.toggle('current',current);button.classList.toggle('locked',locked);button.disabled=locked;
-    const known=!locked,status=done?`Rango ${W.rank} conseguido`:current?'Tu destino actual':'Permanece oculto hasta completar el mundo anterior';
+    button.type='button';button.className='journeycard';button.classList.toggle('done',done);button.classList.toggle('current',current);button.classList.toggle('locked',locked);button.disabled=false;
+    const known=true,status=done?`Rango ${W.rank} conseguido`:current?'Tu destino actual':'Puedes explorar este destino; sus retos siguen bloqueados';
     button.innerHTML=`<img src="./assets/worlds/${W.art}" alt="" width="120" height="80"><span><small>DESTINO ${i+1} · ${W.range}</small><strong>${known?W.place:'Por descubrir'}</strong><em>${status}</em></span>`;
-    button.setAttribute('aria-label',locked?`Destino ${i+1}, ${W.range}, por descubrir`:done?`${W.place}, ${W.range}, superado`:`${W.place}, ${W.range}, destino actual`);
-    if(!locked)button.onclick=()=>{$('#journeyOverview').close();mapWorld=i;drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});};
+    button.setAttribute('aria-label',locked?`${W.place}, ${W.range}, explorar, retos bloqueados`:done?`${W.place}, ${W.range}, superado`:`${W.place}, ${W.range}, destino actual`);
+    button.onclick=()=>{$('#journeyOverview').close();mapWorld=i;drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});};
     list.append(button);
   });
 }
@@ -320,7 +321,9 @@ $('#installGame').hidden=isStandalone();
 $('#badges').onclick=()=>{renderCollection();$('#collection').showModal();};$('[data-close="collection"]').onclick=()=>$('#collection').close();
 $('#journeyButton').onclick=()=>{renderJourney();$('#journeyOverview').showModal();$('#journeyList .current,#journeyList .done').focus({preventScroll:true});};$('[data-close="journey"]').onclick=()=>$('#journeyOverview').close();
 $('#journeyCurrent').onclick=()=>{$('#journeyOverview').close();mapWorld=worldIndexForLevel(state.completed>=100?99:state.index);drawMap();$('#levelNodes .current,#badges').focus({preventScroll:true});};
-$('#previousWorld').onclick=()=>{if(mapWorld>0){mapWorld--;drawMap();}};$('#nextWorld').onclick=()=>{if(mapWorld<unlockedWorldIndex(state)){mapWorld++;drawMap();}};
+function changeMapWorld(direction){const next=Math.max(0,Math.min(9,mapWorld+direction));if(next===mapWorld)return;mapWorld=next;drawMap();}
+$('#previousWorld').onclick=()=>changeMapWorld(-1);$('#nextWorld').onclick=()=>changeMapWorld(1);
+bindMapSwipe($('#worldScene'),changeMapWorld);
 async function createAchievementCard(worldIndex){
   const W=worlds[worldIndex],canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');canvas.width=1080;canvas.height=1350;
   const gradient=ctx.createLinearGradient(0,0,1080,1350);gradient.addColorStop(0,W.tone);gradient.addColorStop(1,'#102d50');ctx.fillStyle=gradient;ctx.fillRect(0,0,1080,1350);

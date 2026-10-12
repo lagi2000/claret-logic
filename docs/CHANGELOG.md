@@ -1,3 +1,11 @@
+## 3.11.0 · Exploración del recorrido
+
+- Deslizamiento horizontal entre diez destinos, además de botones anterior/siguiente.
+- Vista completa de destinos pendientes sin desbloquear retos ni modificar progreso.
+- Los retos completados siguen disponibles para mejorar estrellas.
+- Avatar de Claret también en las rutas antiguas de iconos para evitar servir la C.
+- 181 pruebas automáticas. iOS puede mantener un icono ya instalado; la web no puede forzar su sustitución.
+
 ## 3.10.0 · Ayudas para aprender y saludo
 
 - Ayudas recalculadas desde marcas actuales; buscan una colocación segura mediante cadena deductiva, sin exigir un orden predeterminado.
