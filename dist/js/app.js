@@ -4,7 +4,7 @@ import {bindMapSwipe} from './map-swipe.js';
 import {tutorials} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
 import {teachingHint,advanceLesson} from './teaching.js';
-import {KEY,attemptClaret,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
+import {KEY,recoverRoundScore,attemptClaret,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
 import {fittedBoardSize} from './layout.js';
@@ -18,7 +18,7 @@ const introducedMissions=new Set(),ambientSymbols=['✦','❋','○','◇','≈'
 let hintSource=[],hintExcluded=[];
 const current=()=>practice??state, level=()=>practice?tutorials[practice.index]:levels[state.index];
 function persist(){if(practice&&onboarding){state.tutorialIndex=practice.index;state.tutorialRound=cloneRound(practice.round);}if(!save(storage,state))$('#storageWarning').hidden=false;}
-function cleanRound(s){upgradeCampaign(s,levels);const n=levels[s.index].size;s.round.marks=Object.fromEntries(Object.entries(s.round.marks).filter(([k])=>+k<n*n));if(s.round.solved&&!diagnose(levels[s.index],s.round.marks).ok)s.round.solved=false;}
+function cleanRound(s){upgradeCampaign(s,levels);const n=levels[s.index].size;s.round.marks=Object.fromEntries(Object.entries(s.round.marks).filter(([k])=>+k<n*n));if(s.round.solved&&!diagnose(levels[s.index],s.round.marks).ok)s.round.solved=false;recoverRoundScore(s);}
 cleanRound(state);
 const screens={start:$('#start'),map:$('#worldMap'),game:$('#game')};
 function showScreen(name){
@@ -56,7 +56,7 @@ function victoryMessage(){
   title.textContent=practice?'¡Práctica superada!':s.index===99?'¡Eres Mente Claret!':'¡Reto superado!';
   const W=worlds[worldIndexForLevel(s.index)],done=s.index%10+1;
   detail.textContent=practice?(s.index===0?'Ya dominas el primer tablero. Vamos al siguiente.':'Ya puedes comenzar tu viaje.'):
-    `${W.place} · ${done}/10 retos completados${done<10?` · A ${10-done} del rango ${W.rank}`:` · Rango ${W.rank} conseguido`}`;
+    `${'★'.repeat(s.round.lives)} · ${W.place} · ${done}/10 retos completados${done<10?` · A ${10-done} del rango ${W.rank}`:` · Rango ${W.rank} conseguido`}`;
   $('#message').className='message success victory-message';$('#message').replaceChildren(title,detail);
 }
 function react(kind,text){
@@ -261,14 +261,15 @@ function drawMap(){
   $('#worldScene').style.setProperty('--world-tone',W.tone);$('#worldArt').src=`./assets/worlds/${W.art}`;$('#worldArt').alt=`Escenario de ${W.place}`;
   $('#worldNumber').textContent=`MUNDO ${mapWorld+1} DE 10`;$('#worldTitle').textContent=W.place;$('#worldRange').textContent=W.range;$('#worldRankLabel').textContent=state.completed>=(mapWorld+1)*10?'Rango':'Meta';$('#worldRank').textContent=W.rank;$('#worldDescription').textContent=W.description;renderAmbience();
   $('#routeLine').setAttribute('points',routePoints.map(p=>p.join(',')).join(' '));
+  if(levels.slice(start,start+10).some(L=>L.n<=state.completed&&!state.stars[L.n-1]))$('#worldDescription').textContent+=' · ☆: puntuación antigua sin registrar; repite el reto para conseguir estrellas.';
   const nodes=$('#levelNodes');nodes.replaceChildren();
   routePoints.forEach(([x,y],i)=>{
     const number=start+i+1,done=number<=state.completed,current=number===state.completed+1&&state.completed<100,available=mapWorld<=unlocked&&(done||current);
-    const mission=missionFor(number-1,levels[number-1]),b=document.createElement('button');b.type='button';b.className='levelnode';b.style.left=x+'%';b.style.top=y+'%';b.textContent=number;if(state.stars[number-1]){const stars=document.createElement('span');stars.className='node-stars';stars.textContent='★'.repeat(state.stars[number-1]);b.append(stars);}b.dataset.level=number;
+    const mission=missionFor(number-1,levels[number-1]),b=document.createElement('button');b.type='button';b.className='levelnode';b.style.left=x+'%';b.style.top=y+'%';b.textContent=number;if(done){const stars=document.createElement('span');stars.className='node-stars';stars.setAttribute('aria-hidden','true');const score=state.stars[number-1]??0;for(let j=1;j<=3;j++){const star=document.createElement('span');star.className=j<=score?'earned':'empty';star.textContent=j<=score?'★':'☆';stars.append(star);}b.append(stars);}b.dataset.level=number;
     b.classList.toggle('done',done);b.classList.toggle('current',current);b.classList.toggle('locked',!available);b.disabled=!available;
     if(mission){b.classList.add('mission-node');b.dataset.mission=mission.symbol;}
     const missionName=mission?`, misión ${mission.short}`:'';
-    b.setAttribute('aria-label',done?`Reto ${number}${missionName}, superado${state.stars[number-1]?`, ${state.stars[number-1]} estrellas`:''}`:current?`Reto ${number}${missionName}, continuar`:`Reto ${number}${missionName}, bloqueado`);
+    b.setAttribute('aria-label',done?`Reto ${number}${missionName}, superado${state.stars[number-1]?`, ${state.stars[number-1]} estrellas`:', estrellas sin registro, repite para puntuarlas'}`:current?`Reto ${number}${missionName}, continuar`:`Reto ${number}${missionName}, bloqueado`);
     if(available)b.onclick=()=>{if(number!==state.index+1||state.round.solved){state.index=number-1;state.round=fresh().round;persist();}startGame();};nodes.append(b);
   });
   $('#previousWorld').disabled=mapWorld===0;$('#nextWorld').disabled=mapWorld===9;
@@ -382,7 +383,7 @@ $('#dailyContinue').onclick=()=>closeDaily();
 $('#dailySkip').onclick=()=>closeDaily();$('#dailyClose').onclick=()=>closeDaily();$('#dailyBackdrop').onclick=()=>closeDaily();
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#daily').open){e.preventDefault();closeDaily();}else if(!$('#installOverlay').hidden){e.preventDefault();closeInstallGuide();}});
 window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)return;try{
-  const previousIndex=state.index;state=normalize(JSON.parse(event.newValue));cleanRound(state);
+  const previousIndex=state.index;state=load(storage).state;cleanRound(state);
   if(practice)return;
   if(previousIndex!==state.index){
     for(const selector of ['#worldIntro','#missionIntro','#achievement'])if($(selector).open)$(selector).close();

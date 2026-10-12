@@ -14,4 +14,4 @@ export const worlds = [
 export const routePoints = [[20,87],[52,79],[76,71],[48,63],[22,55],[38,47],[70,39],[58,31],[28,24],[52,18]];
 
 export function worldIndexForLevel(levelIndex){return Math.min(9,Math.max(0,Math.floor(levelIndex/10)));}
-export function unlockedWorldIndex(state){return worldIndexForLevel(state.completed>=100?99:state.index);}
+export function unlockedWorldIndex(state){return worldIndexForLevel(Math.min(99,state.completed));}

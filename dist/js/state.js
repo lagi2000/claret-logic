@@ -1,4 +1,18 @@
 export const KEY='claretLogic.v4';
+export const RESULTS_KEY='claretLogic.results.v1';
+export function mergeResults(s,record){
+  if(!record||typeof record!=='object')return s;
+  const history=normalize(record),before=s.completed;
+  s.completed=Math.max(s.completed,history.completed);
+  s.victories=Math.max(s.victories,history.victories);s.defeats=Math.max(s.defeats,history.defeats);
+  for(const [k,value] of Object.entries(history.stars))s.stars[k]=Math.max(s.stars[k]??0,value);
+  if(s.completed>before){s.index=Math.min(99,s.completed);s.round=fresh().round;s.tutorialDone=true;}
+  return s;
+}
+function storedResults(storage){try{return JSON.parse(storage.getItem(RESULTS_KEY)??'null');}catch{return null;}}
+export function recoverRoundScore(s){
+  if(s.round.solved&&s.round.lives>0&&s.index<s.completed)s.stars[s.index]=Math.max(s.stars[s.index]??0,s.round.lives);
+}
 export const CAMPAIGN_REVISION=20261011;
 export function attemptClaret(s,L,k){
   if(s.round.solved||s.round.lives===0||s.round.marks[k]==='e')return 'blocked';
@@ -44,9 +58,9 @@ export function normalize(raw) {
 }
 export function load(storage) {
   try {
-    const value=storage.getItem(KEY);if(value)return {state:normalize(JSON.parse(value)),warning:false};
+    const value=storage.getItem(KEY);if(value)return {state:mergeResults(normalize(JSON.parse(value)),storedResults(storage)),warning:false};
     const legacy=storage.getItem('claretLogic.v3');
-    if(legacy)return {state:migrateV3(JSON.parse(legacy)),warning:false};
+    if(legacy)return {state:mergeResults(migrateV3(JSON.parse(legacy)),storedResults(storage)),warning:false};
     const s=fresh(), oldLevel=Number(storage.getItem('claretLevel25'));
     if(oldLevel>=1&&oldLevel<=100){s.index=Math.max(0,oldLevel-3);s.completed=s.index;s.tutorialDone=oldLevel>=3;s.tutorialIndex=oldLevel===2?1:0;}
     for(const [field,key,max] of [['helps','claretHelps25',3],['streak','claretStreak25',14]]) {
@@ -54,8 +68,8 @@ export function load(storage) {
     }
     s.sound=storage.getItem('claretSound25')!=='off';
     s.daily={last:storage.getItem('claretDailyDate27')??'',current:Number(storage.getItem('claretDailyStreak27'))||0,best:Number(storage.getItem('claretDailyBest27'))||0};
-    return {state:normalize(s),warning:false};
-  } catch{return {state:fresh(),warning:true};}
+    return {state:mergeResults(normalize(s),storedResults(storage)),warning:false};
+  } catch{return {state:mergeResults(fresh(),storedResults(storage)),warning:true};}
 }
 export function migrateV3(raw){
   const old=normalize(raw),s=normalize({...old,tutorialDone:old.index>=2||old.completed>=2,index:Math.max(0,old.index-2),completed:Math.max(0,old.completed-2)});
@@ -68,7 +82,11 @@ export function advanceTutorial(s,practice,onboarding){
   if(practice.index===0){practice.index=1;practice.round=fresh().round;if(onboarding){s.tutorialIndex=1;s.tutorialRound=clone(practice.round);}return true;}
   if(onboarding){s.tutorialDone=true;s.tutorialIndex=1;s.tutorialRound=clone(practice.round);}return false;
 }
-export function save(storage,state){try{storage.setItem(KEY,JSON.stringify(state));return true;}catch{return false;}}
+export function save(storage,state){try{
+  mergeResults(state,storedResults(storage));
+  storage.setItem(RESULTS_KEY,JSON.stringify({completed:state.completed,victories:state.victories,defeats:state.defeats,stars:state.stars}));
+  storage.setItem(KEY,JSON.stringify(state));return true;
+}catch{return false;}}
 export function resetRound(s){if(s.round.solved||s.round.lives>0)return false;s.round=fresh().round;return true;}
 export function complete(s) {
   if(s.round.solved||s.round.lives===0)return false;s.round.solved=true;

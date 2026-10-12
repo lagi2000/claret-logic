@@ -1,3 +1,11 @@
+## 3.12.0 · Auditoría de estrellas y progreso
+
+- Estrellas de tres posiciones visibles en todos los retos completados; las puntuaciones antiguas desconocidas se distinguen con contornos y explicación, sin inventar vidas históricas.
+- Respaldo independiente de mejores estrellas, victorias, derrotas y progreso; no retrocede ante una pestaña con guardado atrasado o una edición sin los campos nuevos.
+- Recuperación de puntuación de un intento ya resuelto cuando conserva sus vidas.
+- Corregido bloqueo de mundos después de repetir un nivel antiguo: desbloqueo según progreso total.
+- Estrellas también en el mensaje de victoria. 187 pruebas y certificación de los 102 tableros.
+
 ## 3.11.1 · Recursos gráficos e instalación
 
 - Recuperada la ilustración original de Sevilla: el archivo publicado estaba vacío.
