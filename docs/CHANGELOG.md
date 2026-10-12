@@ -1,3 +1,10 @@
+## 3.11.1 · Recursos gráficos e instalación
+
+- Recuperada la ilustración original de Sevilla: el archivo publicado estaba vacío.
+- La compilación rechaza archivos vacíos; las pruebas comprueban cabeceras y longitud de los diez WebP.
+- Icono Apple 180×180 explícito y convencional, con la cara de Claret. Guía de instalación indica abrir Safari fuera del visor del chat.
+- No se borran datos ni se altera progreso. Un icono ya guardado por iOS no puede sustituirse a distancia.
+
 ## 3.11.0 · Exploración del recorrido
 
 - Deslizamiento horizontal entre diez destinos, además de botones anterior/siguiente.

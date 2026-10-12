@@ -40,7 +40,7 @@ function closeInstallGuide(){
 function showInstallGuide(){
   installReturnFocus=document.activeElement;const ios=/iphone|ipad|ipod/i.test(navigator.userAgent)||navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1;
   $('#installText').textContent=ios?'En iPhone o iPad se instala desde el menú Compartir de Safari.':'Puedes instalarlo desde el menú de tu navegador.';
-  const steps=ios?['Pulsa Compartir: el cuadrado con una flecha hacia arriba.','Desliza y elige “Añadir a pantalla de inicio”.','Pulsa “Añadir”.']:['Abre el menú del navegador.','Elige “Instalar aplicación” o “Añadir a pantalla de inicio”.','Confirma la instalación.'];
+  const steps=ios?['Abre https://lagi2000.github.io/claret-logic/ directamente en Safari, fuera del visor de ChatGPT o WhatsApp.','En Safari, pulsa Compartir y elige “Añadir a pantalla de inicio”.','Comprueba que la vista previa muestre la cara de Claret y pulsa “Añadir”. Conserva el acceso anterior hasta comprobar el progreso.']:['Abre el menú del navegador.','Elige “Instalar aplicación” o “Añadir a pantalla de inicio”.','Confirma la instalación.'];
   $('#installSteps').replaceChildren(...steps.map(text=>{const li=document.createElement('li');li.textContent=text;return li;}));$('#installOverlay').hidden=false;$('#installClose').focus({preventScroll:true});
 }
 async function requestInstall(){

@@ -4,6 +4,7 @@ import crypto from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 const root=new URL('../dist/',import.meta.url);
 const list=fs.readdirSync(root,{recursive:true}).filter(f=>fs.statSync(new URL(f,root)).isFile()&&f!=='sw.js').sort();
+for(const f of list)if(fs.statSync(new URL(f,root)).size===0)throw Error('Empty release asset: '+f);
 for(const f of list.filter(f=>f.endsWith('.js')))execFileSync(process.execPath,['--check',new URL(f,root).pathname]);
 const html=fs.readFileSync(new URL('index.html',root),'utf8');
 for(const m of html.matchAll(/(?:src|href)="\.\/([^"#]+)"/g))if(!fs.existsSync(new URL(m[1],root)))throw Error('Missing asset: '+m[1]);

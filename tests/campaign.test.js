@@ -28,7 +28,11 @@ test('Cada mundo dispone de arte web optimizado y metadatos completos',async()=>
     assert.ok(world.description.length>30);
     const path=new URL(`../dist/assets/worlds/${world.art}`,import.meta.url);
     await access(path);
-    assert.ok((await stat(path)).size<300_000,`${world.art} debe pesar menos de 300 KB`);
+    const bytes=await readFile(path);
+    assert.ok(bytes.length>1000&&bytes.length<300_000,`${world.art} debe tener contenido y pesar menos de 300 KB`);
+    assert.equal(bytes.toString('ascii',0,4),'RIFF',`${world.art}: cabecera inválida`);
+    assert.equal(bytes.toString('ascii',8,12),'WEBP',`${world.art}: no es WebP`);
+    assert.equal(bytes.readUInt32LE(4)+8,bytes.length,`${world.art}: contenedor incompleto`);
   }
 });
 
