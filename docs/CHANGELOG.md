@@ -5,6 +5,7 @@
 - Recuperación de puntuación de un intento ya resuelto cuando conserva sus vidas.
 - Corregido bloqueo de mundos después de repetir un nivel antiguo: desbloqueo según progreso total.
 - Estrellas también en el mensaje de victoria. 187 pruebas y certificación de los 102 tableros.
+- Ruta separada de cabecera y descripción: evita que la ficha inferior tape las estrellas del primer reto.
 
 ## 3.11.1 · Recursos gráficos e instalación
 

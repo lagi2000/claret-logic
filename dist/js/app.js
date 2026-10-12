@@ -262,6 +262,7 @@ function drawMap(){
   $('#worldNumber').textContent=`MUNDO ${mapWorld+1} DE 10`;$('#worldTitle').textContent=W.place;$('#worldRange').textContent=W.range;$('#worldRankLabel').textContent=state.completed>=(mapWorld+1)*10?'Rango':'Meta';$('#worldRank').textContent=W.rank;$('#worldDescription').textContent=W.description;renderAmbience();
   $('#routeLine').setAttribute('points',routePoints.map(p=>p.join(',')).join(' '));
   if(levels.slice(start,start+10).some(L=>L.n<=state.completed&&!state.stars[L.n-1]))$('#worldDescription').textContent+=' · ☆: puntuación antigua sin registrar; repite el reto para conseguir estrellas.';
+  fitMapRoute();
   const nodes=$('#levelNodes');nodes.replaceChildren();
   routePoints.forEach(([x,y],i)=>{
     const number=start+i+1,done=number<=state.completed,current=number===state.completed+1&&state.completed<100,available=mapWorld<=unlocked&&(done||current);
@@ -275,6 +276,12 @@ function drawMap(){
   $('#previousWorld').disabled=mapWorld===0;$('#nextWorld').disabled=mapWorld===9;
   $('#worldDots').textContent=worlds.map((_,i)=>i===mapWorld?'●':i<=unlocked?'•':'·').join(' ');
 }
+function fitMapRoute(){
+  if($('#worldMap').hidden)return;const scene=$('#worldScene');
+  scene.style.setProperty('--map-head',Math.ceil($('.worldheading').getBoundingClientRect().height+8)+'px');
+  scene.style.setProperty('--map-foot',Math.ceil($('#worldDescription').getBoundingClientRect().height+22)+'px');
+}
+window.addEventListener('resize',fitMapRoute);window.visualViewport?.addEventListener('resize',fitMapRoute);
 function openMap(index=worldIndexForLevel(state.completed>=100?99:state.index)){
   // A solved round can survive a refresh. Resume the journey without leaving
   // the player on a map where every visible node is disabled.
