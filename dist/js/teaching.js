@@ -25,8 +25,8 @@ export function teachingHint(L,marks){
  }
  return null;
 }
-export function advanceLesson(s,key,free=false){
+export function advanceLesson(s,key,free=false,maxStage=3){
  if(s.round.lessonKey!==key){if(!spendHint(s,free))return 0;s.round.lessonKey=key;s.round.helpStep=1;}
- else s.round.helpStep=Math.min(3,s.round.helpStep+1);
+ else s.round.helpStep=Math.min(maxStage,s.round.helpStep+1);
  return s.round.helpStep;
 }

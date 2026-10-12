@@ -199,6 +199,7 @@ dialog:not([open]){display:none!important}
 @keyframes claretHello{50%{background-position:50% 0}}
 .cell:has(.claret-wave)>img{visibility:hidden}
 .hint{max-height:140px;overflow:auto;line-height:1.45}
+.board .cell.hint-source{box-shadow:inset 0 0 0 4px #0579ba}.board .cell.hint-excluded{box-shadow:inset 0 0 0 4px #c76a00;background-image:repeating-linear-gradient(135deg,transparent 0 8px,#c76a0020 8px 11px)}
 @media(prefers-reduced-motion:reduce){.claret-wave{display:none}.cell:has(.claret-wave)>img{visibility:visible}}
 .board .cell.failed .cross{color:#c41638;opacity:1}.board .cell.failed{box-shadow:inset 0 0 0 3px #c4163870}
 .game-results{display:block;color:#d7eaff;font-size:.75rem;text-align:center;margin:5px 0}

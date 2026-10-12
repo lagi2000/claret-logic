@@ -14,6 +14,7 @@ let storage;try{storage=window.localStorage;}catch{}
 const initial=load(storage);let state=initial.state,practice=null,onboarding=false,tool='c',focusCell=0,highlights=[],pendingHint=null,mapWorld=worldIndexForLevel(initial.state.index),pendingAchievement=null,reactionTimer=0,rewardTimer=0,rewardHideTimer=0,dailyReturnFocus=null,dailyTimer=0,installPrompt=null,installReturnFocus=null,shareCardPromise=null;
 const palette=['#ffc8d9','#bde9d2','#bfe2ff','#ffe69b','#d9c8ff','#ffd5ad','#66c9c3','#b7c576','#94a9dd','#dea5bc'];
 const introducedMissions=new Set(),ambientSymbols=['✦','❋','○','◇','≈','•','✧','❋','◆','✦'];
+let hintSource=[],hintExcluded=[];
 const current=()=>practice??state, level=()=>practice?tutorials[practice.index]:levels[state.index];
 function persist(){if(practice&&onboarding){state.tutorialIndex=practice.index;state.tutorialRound=cloneRound(practice.round);}if(!save(storage,state))$('#storageWarning').hidden=false;}
 function cleanRound(s){upgradeCampaign(s,levels);const n=levels[s.index].size;s.round.marks=Object.fromEntries(Object.entries(s.round.marks).filter(([k])=>+k<n*n));if(s.round.solved&&!diagnose(levels[s.index],s.round.marks).ok)s.round.solved=false;}
@@ -105,6 +106,7 @@ function drawBoard(){
     if(r>0&&L.regions[r-1][c]!==region)b.style.borderTop='3px solid #17385c';
     if(c>0&&L.regions[r][c-1]!==region)b.style.borderLeft='3px solid #17385c';
     b.classList.toggle('failed',v==='e');b.classList.toggle('auto',isX&&v!=='x'&&v!=='e');b.classList.toggle('hi',highlights.includes(k));b.classList.toggle('fixed',Boolean(mission?.fixed?.includes(k)));
+    b.classList.toggle('hint-source',hintSource.includes(k));b.classList.toggle('hint-excluded',hintExcluded.includes(k));
     b.setAttribute('aria-label',`Fila ${r+1}, columna ${c+1}, región ${region+1}: ${v==='c'?(mission?.fixed?.includes(k)?'Claret guía':'Claret'):isX?(v==='e'?'fallo, descarte fijo':v==='x'?'descarte manual':'descarte automático'):'vacía'}`);
     b.setAttribute('aria-pressed',String(v==='c'));b.setAttribute('aria-disabled',String(s.round.solved));
     if(v==='c'){const img=document.createElement('img');img.src='./assets/claret.jpeg';img.alt='';b.append(img);}
@@ -120,7 +122,7 @@ function drawBoard(){
 }
 function redraw(){
   const s=current();if(!practice)seedMission(s.index,level(),s.round);
-  highlights=[];pendingHint=null;focusCell=0;$('#hintText').hidden=true;
+  highlights=[];hintSource=[];hintExcluded=[];pendingHint=null;focusCell=0;$('#hintText').hidden=true;
   const mission=practice?null:missionFor(s.index,level());
   if(mission?.type==='logical'&&!Object.keys(s.round.marks).length&&mission.preferredTool)tool=mission.preferredTool;
   drawBoard();setTool(tool);
@@ -145,7 +147,7 @@ function mark(k){
       if(outcome==='lost')$('#check').focus({preventScroll:true});return;
     }
   }else if(marks[k]===tool)delete marks[k];else marks[k]=tool;
-  highlights=[];pendingHint=null;s.round.helpStep=0;$('#hintText').hidden=true;
+  highlights=[];hintSource=[];hintExcluded=[];pendingHint=null;s.round.helpStep=0;$('#hintText').hidden=true;
   persist();drawBoard();const cell=board.querySelector(`[data-cell="${k}"]`);cell.focus({preventScroll:true});if(tool==='c'&&marks[k]==='c'){cell.classList.add('selected');pulseConsequences(k,L);react('think','Veamos qué implica…');}
   const logicalAfter=mission?.type==='logical'&&missionProgress(mission,marks)==='Primera deducción conseguida';
   const missionMoment=mission?.type==='intruder'&&k===mission.intruder&&!marks[k]?'¡Intruso localizado! Ahora completa el tablero.':!logicalBefore&&logicalAfter?'¡Primera deducción conseguida! Continúa con el tablero.':'';
@@ -174,11 +176,12 @@ function showHint(){
   const s=current(),L=level();if(s.round.solved||s.round.lives===0)return;
   const h=teachingHint(L,s.round.marks);if(!h){message('El tablero ya está resuelto.');return;}
   const key=JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b)));
-  const stage=advanceLesson(s,key,!!practice);if(!stage)return;
+  const maxStage=Math.max(3,(h.steps?.length??0)+2),stage=advanceLesson(s,key,!!practice,maxStage);if(!stage)return;
+  hintSource=[];hintExcluded=[];
   pendingHint=h;
   if(h.type==='review'||h.type==='conflict'){highlights=h.cells;$('#hintText').textContent=h.reason;}
-  else if(stage===1){highlights=h.group.cells;$('#hintText').textContent=`Observa la ${h.group.kind} ${h.group.index+1}. Vamos a encontrar un Claret seguro, sin adivinar.`;}
-  else if(stage===2){highlights=h.cells;$('#hintText').textContent=h.explanation;}
+  else if(stage===1){highlights=h.steps?.[0]?.group.cells??h.group.cells;$('#hintText').textContent=`Observa la ${h.steps?.[0]?.group.kind??h.group.kind} ${(h.steps?.[0]?.group.index??h.group.index)+1}. Vamos a encontrar un Claret seguro, sin adivinar.`;}
+  else if(stage<maxStage){const step=h.steps?.[stage-2];if(step){highlights=[];hintSource=step.candidates;hintExcluded=step.removed;$('#hintText').textContent=`Paso ${stage-1}/${h.steps.length}: el Claret de la ${step.group.kind} ${step.group.index+1} tiene que estar en una casilla con borde azul. Cualquiera de esas posiciones entra en conflicto con las casillas de borde naranja: podemos descartarlas. Pulsa «Explícame más» para seguir.`;}else{highlights=h.cells;$('#hintText').textContent=h.explanation;}}
   else{highlights=[h.target];$('#hintText').textContent=h.reason+' Colócalo tú con doble toque. Esta explicación no gasta otra ayuda.';}
   $('#hintText').hidden=false;persist();drawBoard();play('logical',state.sound);
 }
