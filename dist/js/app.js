@@ -2,7 +2,7 @@ import {levels} from './levels.js';
 import {bindBoardGestures} from './gestures.js';
 import {tutorials} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
-import {nextHint} from './pedagogy.js';
+import {teachingHint,advanceLesson} from './teaching.js';
 import {KEY,attemptClaret,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
@@ -87,7 +87,8 @@ function stats(){
   const milestone=!practice&&s.round.solved&&(s.index+1)%10===0&&!s.celebratedWorlds.includes(Math.floor(s.index/10));
   $('#check').textContent=s.round.solved?solvedActionLabel({practice,index:s.index,onboarding,milestone}):'Comprobar';
   $('#check').disabled=false;$('#gameResults').textContent=`Victorias ${state.victories} · Derrotas ${state.defeats}`;if(s.round.lives===0)$('#check').textContent='Reintentar nivel';
-  $('#reset').disabled=s.round.solved||s.round.lives>0;$('#hint').disabled=s.round.solved||s.round.lives===0||(!practice&&s.helps===0);
+  $('#reset').disabled=s.round.solved||s.round.lives>0;$('#hint').disabled=s.round.solved||s.round.lives===0||(!practice&&s.helps===0&&s.round.lessonKey!==JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b))));
+  $('#hint').textContent=s.round.lessonKey===JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b)))?'Explícame más':'Ayuda';
   $('#leavePractice').hidden=!practice||onboarding;
   $('#sound').setAttribute('aria-pressed',String(state.sound));$('#sound').setAttribute('aria-label',state.sound?'Desactivar sonido':'Activar sonido');$('#sound').textContent=state.sound?'♪':'♪̸';
   document.querySelectorAll('.daily-button').forEach(button=>button.classList.toggle('due',state.daily.last<dateKey()));
@@ -130,6 +131,7 @@ function mark(k){
   const s=current();if(s.round.solved||s.round.lives===0)return;
   focusCell=k;const marks=s.round.marks,L=level(),mission=practice?null:missionFor(s.index,L),gate=missionGate(mission,marks,tool,k),auto=practice?autoMarks(L,marks):new Set();
   if(marks[k]==='e'){message('Esta casilla ya está descartada por un fallo.');return;}
+  const deductionBefore=tool==='c'?teachingHint(L,marks):null;
   const logicalBefore=mission?.type==='logical'&&missionProgress(mission,marks)==='Primera deducción conseguida';
   if(gate){highlights=mission?.type==='intruder'?[...mission.fixed,mission.intruder]:mission?.fixed??[];drawBoard();message(gate,'error');react('worry','Revisa esa relación');play('error',state.sound);return;}
   if(tool==='x'&&marks[k]==='c'){message('Selecciona Claret para retirar esa figura.');react('worry','Primero cambia de herramienta');return;}
@@ -150,6 +152,8 @@ function mark(k){
   if(missionMoment)react('spark','¡Buena deducción!');
   message(missionMoment|| (tool==='c'?(practice?'Hipótesis actualizada. Revisa sus consecuencias.':'Claret colocado. Ahora decide tus descartes.'):'Descarte actualizado.'),missionMoment?'success':'');play(missionMoment?'logical':tool==='c'?'place':'x',state.sound);haptic();
   if(tool==='c'&&marks[k]==='c'){
+    const wave=document.createElement('span');wave.className='claret-wave';wave.setAttribute('aria-hidden','true');cell.append(wave);setTimeout(()=>wave.remove(),720);
+    if(deductionBefore?.type==='place'&&deductionBefore.target===k)message('¡Bien deducido! '+deductionBefore.reason,'success');
     const result=diagnose(L,marks);
     if(result.ok)check();
     else if(result.cells?.length){highlights=result.cells;drawBoard();message(result.message,'error');play('error',state.sound);}
@@ -168,31 +172,15 @@ function safeMark(k){
 function setTool(value){tool=value;$('#toolClaret').setAttribute('aria-pressed',String(value==='c'));$('#toolX').setAttribute('aria-pressed',String(value==='x'));}
 function showHint(){
   const s=current(),L=level();if(s.round.solved||s.round.lives===0)return;
-  let h=pendingHint;
-  if(!h){
-    h=nextHint(L,s.round.marks);
-    if(!h&&practice){
-      const g=groups(L).find(g=>!g.cells.some(k=>s.round.marks[k]==='c'));
-      if(g)h={type:'tutorial',group:g,candidates:g.cells,reason:L.n===1?'Esta región necesita un Claret. Prueba una casilla y observa las X.':'Busca una casilla de esta región que no comparta fila ni columna con otro Claret.'};
-    }
-    if(!h){message('Revisa las marcas y pulsa Comprobar.');return;}
-    pendingHint=h;
-  }
-  if(!spendHint(s,!!practice))return;
-  const stage=s.round.helpStep||3;
-  if(h.type==='conflict') {
-    highlights=h.cells;$('#hintText').textContent=h.reason+' Revisa estas dos casillas.';
-  }else if(h.type==='tutorial') {
-    highlights=h.group.cells;$('#hintText').textContent=h.reason;
-  }else if(stage===1){
-    highlights=h.group.cells;$('#hintText').textContent=`Observa la ${h.group.kind} ${h.group.index+1}. ¿Qué posibilidades le quedan?`;
-  }else if(stage===2){
-    highlights=h.candidates;$('#hintText').textContent=h.type==='place'?'Mira las X y compara las posibilidades de la zona señalada. Solo una casilla permite cumplir sus reglas.':`Compara las ${h.candidates.length} posibilidades señaladas: ¿qué casillas impiden todas ellas?`;
-  }else{
-    s.round.marks[h.target]=h.type==='place'?'c':'x';highlights=[h.target];$('#hintText').textContent=h.reason+' He realizado solo ese paso.';pendingHint=null;
-  }
-  $('#hintText').hidden=false;persist();drawBoard();play('place',state.sound);
-  if(diagnose(L,s.round.marks).ok)check();
+  const h=teachingHint(L,s.round.marks);if(!h){message('El tablero ya está resuelto.');return;}
+  const key=JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b)));
+  const stage=advanceLesson(s,key,!!practice);if(!stage)return;
+  pendingHint=h;
+  if(h.type==='review'||h.type==='conflict'){highlights=h.cells;$('#hintText').textContent=h.reason;}
+  else if(stage===1){highlights=h.group.cells;$('#hintText').textContent=`Observa la ${h.group.kind} ${h.group.index+1}. Vamos a encontrar un Claret seguro, sin adivinar.`;}
+  else if(stage===2){highlights=h.cells;$('#hintText').textContent=h.explanation;}
+  else{highlights=[h.target];$('#hintText').textContent=h.reason+' Colócalo tú con doble toque. Esta explicación no gasta otra ayuda.';}
+  $('#hintText').hidden=false;persist();drawBoard();play('logical',state.sound);
 }
 function check(){
   const s=current();if(s.round.lives===0){retryLevel();return;}if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}

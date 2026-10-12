@@ -26,7 +26,7 @@ export function normalize(raw) {
   s.tutorialDone=raw.tutorialDone===true;s.tutorialIndex=integer(raw.tutorialIndex,0,1,0);
   if(raw.tutorialRevision===2&&raw.tutorialRound&&typeof raw.tutorialRound==='object'){
     const t=raw.tutorialRound;
-    s.tutorialRound={marks:Object.fromEntries(Object.entries(t.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<16&&['c','x','e'].includes(v))),lives:integer(t.lives,0,3,3),usedHelp:t.usedHelp===true,helpStep:integer(t.helpStep,0,2,0),solved:t.solved===true};
+    s.tutorialRound={marks:Object.fromEntries(Object.entries(t.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<16&&['c','x','e'].includes(v))),lives:integer(t.lives,0,3,3),usedHelp:t.usedHelp===true,helpStep:integer(t.helpStep,0,3,0),solved:t.solved===true};
   }
   s.index=integer(raw.index,0,99,0);s.completed=integer(raw.completed,0,100,s.index);
   s.victories=integer(raw.victories,0,1000000,0);s.defeats=integer(raw.defeats,0,1000000,0);
@@ -37,7 +37,9 @@ export function normalize(raw) {
   s.seenWorlds=Array.isArray(raw.seenWorlds)?[...new Set(raw.seenWorlds.filter(value=>Number.isInteger(value)&&value>=0&&value<10))]:[];
   s.celebratedWorlds=Array.isArray(raw.celebratedWorlds)?[...new Set(raw.celebratedWorlds.filter(value=>Number.isInteger(value)&&value>=0&&value<10&&raw.completed>=(value+1)*10))]:[];
   const round=raw.round;
-  if(round&&typeof round==='object')s.round={marks:Object.fromEntries(Object.entries(round.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<100&&['c','x','e'].includes(v))),lives:integer(round.lives,0,3,3),usedHelp:round.usedHelp===true,helpStep:integer(round.helpStep,0,2,0),solved:round.solved===true};
+  if(round&&typeof round==='object')s.round={marks:Object.fromEntries(Object.entries(round.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<100&&['c','x','e'].includes(v))),lives:integer(round.lives,0,3,3),usedHelp:round.usedHelp===true,helpStep:integer(round.helpStep,0,3,0),solved:round.solved===true};
+  if(typeof round?.lessonKey==='string'&&round.lessonKey.length<3000)s.round.lessonKey=round.lessonKey;
+  if(typeof raw.tutorialRound?.lessonKey==='string'&&raw.tutorialRound.lessonKey.length<3000)s.tutorialRound.lessonKey=raw.tutorialRound.lessonKey;
   return s;
 }
 export function load(storage) {

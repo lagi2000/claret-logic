@@ -1,3 +1,12 @@
+## 3.10.0 · Ayudas para aprender y saludo
+
+- Ayudas recalculadas desde marcas actuales; buscan una colocación segura mediante cadena deductiva, sin exigir un orden predeterminado.
+- Una ayuda por deducción. Explicación ampliable, conservada tras recargar; el jugador realiza la colocación final.
+- Detección de cruces personales que impiden avanzar. Feedback breve de deducción, sin cuestionarios ni pantallas nuevas.
+- Saludo de Claret de dos fotogramas, dentro de la casilla, sin bloquear controles y desactivado con reducción de movimiento.
+- 180 pruebas: cadenas lógicas de los 100 retos, dos órdenes de colocación, ayudas, persistencia, vidas y estrellas.
+- No se incluyen tarjetas biográficas. Se mantiene la curva de cuadrículas 4×4–10×10.
+
 ## 3.9.0 · Vidas, errores y estrellas
 
 - Claret incorrecto pierde una vida y deja una cruz roja fija. Las notas normales no penalizan.
