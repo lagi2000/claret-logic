@@ -219,3 +219,29 @@ dialog:not([open]){display:none!important}
 @media(max-width:559px){.topbar .brand strong{font-size:1rem}.rank{padding:7px 10px}.rank strong{font-size:.88rem}.rank .eyebrow{font-size:.6rem}.topbar{padding-bottom:7px}.hud h1{font-size:1.45rem}.play{padding:10px}.app{padding-left:10px;padding-right:10px}.tools{max-width:260px}.gesture-guide{margin:2px 0 5px;font-size:.74rem}}
 
 .release-label{display:block;margin:8px auto;color:#c9dced;font-size:.72rem;text-align:center}.release-label a{color:inherit;text-underline-offset:3px}.update-notice{position:fixed;z-index:1000;inset:auto 12px max(12px,env(safe-area-inset-bottom));margin:auto;max-width:620px;padding:12px;border:2px solid #fff;border-radius:18px;background:#17385c;color:white;box-shadow:0 6px 24px #0005;font-size:.9rem}.update-notice button{margin:6px 4px 0 0;background:#fff;color:#17385c;min-height:44px}
+
+/* Board-first layout: spend screen space on the puzzle, not repeated copy. */
+#game{padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+#game footer,.play .boardfoot{display:none}
+.play{border-radius:20px;padding:10px}
+.play .board{max-width:100%;margin-bottom:8px;border-radius:18px;box-shadow:0 5px 0 #a9c2d6,0 8px 22px #17385c16}
+.mini-rules span{padding:5px 4px;font-size:.75rem}
+.gesture-guide{margin:3px 0 5px}
+.message{min-height:28px;font-size:.9rem}
+.actions button{min-height:48px}
+@media(min-width:761px) and (min-height:521px){
+ #game{max-width:1160px}.arena{grid-template-columns:190px minmax(0,1fr);gap:20px}
+ .hud h1{font-size:2rem}.hud .rank{margin-bottom:14px}.hud .status{gap:8px}
+}
+@media(max-width:559px), (min-width:560px) and (max-width:760px) and (min-height:521px), (min-width:761px) and (max-width:1024px) and (orientation:portrait){
+ #game{max-width:800px;min-height:100svh;display:flex;flex-direction:column;justify-content:safe center;padding-left:max(8px,env(safe-area-inset-left));padding-right:max(8px,env(safe-area-inset-right))}
+ .arena{display:block;margin-top:6px}.hud{position:static}.gamehead{display:flex;align-items:center;margin-top:0;gap:8px}
+ .hud h1{font-size:1.45rem;margin:2px 0 4px}.hud .eyebrow{font-size:.65rem}
+ .rank{max-width:48%;padding:5px 9px;margin:0 0 5px;border-radius:12px}.rank strong{font-size:.85rem;margin:0}.rank .eyebrow{font-size:.6rem}
+ .status{display:flex;gap:5px;margin:4px 0 5px;flex-wrap:wrap}.status>span{width:auto;flex:1;padding:4px 6px;font-size:.75rem;white-space:nowrap}.status #lives{font-size:1rem}
+ .game-results{margin:3px 0;font-size:.7rem}progress{height:5px}
+ .topbar{padding-bottom:6px;gap:8px}.brand small{display:none}.brand img{width:32px;height:32px}.brand strong{font-size:1.05rem}.topbar nav{gap:6px}
+ .play{padding:7px;border-radius:18px}.mini-rules{margin-bottom:4px}.mini-rules span{font-size:.68rem}
+ #tip{font-size:.85rem;line-height:1.25;margin-bottom:4px}.boardmeta{margin:3px 2px;font-size:.75rem}
+ .gesture-guide{font-size:.72rem}.message{margin:4px 0;line-height:1.25}.actions{gap:6px}
+}
