@@ -229,6 +229,7 @@ dialog:not([open]){display:none!important}
 .gesture-guide{margin:3px 0 5px}
 .message{min-height:28px;font-size:.9rem}
 .actions button{min-height:48px}
+.actions:has(#reset:disabled){grid-template-columns:1fr 1.2fr}.actions #reset:disabled{display:none}
 #game .rank,#game #difficulty,#game #progress,#game #gameResults,.status>span:has(#helps),.status>span:has(#streak){display:none}
 .play[data-mission=classic] #tip{display:none}
 @media(min-height:521px), (max-width:559px){
@@ -238,7 +239,7 @@ dialog:not([open]){display:none!important}
  .hud .status{margin:0;gap:0}.hud .status #lives{width:auto;white-space:nowrap;padding:5px 10px;font-size:1.1rem}
 }
 @media(min-width:761px) and (min-height:521px){
- #game{max-width:1160px}.arena{grid-template-columns:190px minmax(0,1fr);gap:20px}
+ #game{max-width:880px}.arena{grid-template-columns:190px minmax(0,1fr);gap:20px}
  .hud h1{font-size:2rem}.hud .rank{margin-bottom:14px}.hud .status{gap:8px}
 }
 @media(max-width:559px), (min-width:560px) and (max-width:760px) and (min-height:521px), (min-width:761px) and (max-width:1024px) and (orientation:portrait){

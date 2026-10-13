@@ -453,9 +453,12 @@ function scheduleFit(){cancelAnimationFrame(fitFrame);fitFrame=requestAnimationF
  const contentHeight=Math.max(0,Math.max(top.bottom,...visibleBottoms)-top.top);
  const playStyle=getComputedStyle($('.play'));
  const maxWidth=$('.play').clientWidth-parseFloat(playStyle.paddingLeft)-parseFloat(playStyle.paddingRight);
- const size=fittedBoardSize({viewport,contentHeight,boardSize:square.height,maxWidth,air:20,min:Math.max(168,level().size*30)});
+ const appStyle=getComputedStyle(app);
+ const air=parseFloat(appStyle.paddingTop)+parseFloat(appStyle.paddingBottom)+16;
+ const size=fittedBoardSize({viewport,contentHeight,boardSize:square.height,maxWidth,air,min:Math.max(168,level().size*30)});
  if(Math.abs(square.width-size)>1)board.style.width=size+'px';
  });}
 new ResizeObserver(scheduleFit).observe($('#game'));
+new ResizeObserver(scheduleFit).observe($('.play'));
 window.addEventListener('resize',scheduleFit);
 window.visualViewport?.addEventListener('resize',scheduleFit);
