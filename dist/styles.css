@@ -229,6 +229,14 @@ dialog:not([open]){display:none!important}
 .gesture-guide{margin:3px 0 5px}
 .message{min-height:28px;font-size:.9rem}
 .actions button{min-height:48px}
+#game .rank,#game #difficulty,#game #progress,#game #gameResults,.status>span:has(#helps),.status>span:has(#streak){display:none}
+.play[data-mission=classic] #tip{display:none}
+@media(min-height:521px), (max-width:559px){
+ #game{max-width:980px}.arena{display:block;margin-top:6px}
+ .hud{display:flex;align-items:center;justify-content:space-between;gap:10px;position:static;margin-bottom:6px}
+ .hud .gamehead{display:block;margin:0}.hud h1{font-size:1.5rem;margin:0}
+ .hud .status{margin:0;gap:0}.hud .status #lives{width:auto;white-space:nowrap;padding:5px 10px;font-size:1.1rem}
+}
 @media(min-width:761px) and (min-height:521px){
  #game{max-width:1160px}.arena{grid-template-columns:190px minmax(0,1fr);gap:20px}
  .hud h1{font-size:2rem}.hud .rank{margin-bottom:14px}.hud .status{gap:8px}

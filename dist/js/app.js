@@ -90,7 +90,8 @@ function stats(){
   $('#check').textContent=s.round.solved?solvedActionLabel({practice,index:s.index,onboarding,milestone}):'Comprobar';
   $('#check').disabled=false;$('#gameResults').textContent=`Victorias ${state.victories} · Derrotas ${state.defeats}`;if(s.round.lives===0)$('#check').textContent='Reintentar nivel';
   $('#reset').disabled=s.round.solved||s.round.lives>0;$('#hint').disabled=s.round.solved||s.round.lives===0||(!practice&&s.helps===0&&s.round.lessonKey!==JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b))));
-  $('#hint').textContent=s.round.lessonKey===JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b)))?'Explícame más':'Ayuda';
+  $('#hint').textContent=s.round.lessonKey===JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b)))?'Explícame más':`Ayuda · ${state.helps}`;
+  $('#personalProgress').textContent=`${earnedRank(state.completed)} · ${state.completed}/100 retos · ${state.victories} victorias · ${state.defeats} derrotas · ${state.streak}/15 retos seguidos sin ayuda.`;
   $('#leavePractice').hidden=!practice||onboarding;
   $('#sound').setAttribute('aria-pressed',String(state.sound));$('#sound').setAttribute('aria-label',state.sound?'Desactivar sonido':'Activar sonido');$('#sound').textContent=state.sound?'♪':'♪̸';
   document.querySelectorAll('.daily-button').forEach(button=>button.classList.toggle('due',state.daily.last<dateKey()));
