@@ -56,8 +56,9 @@ function victoryMessage(){
   title.textContent=practice?'¡Práctica superada!':s.index===99?'¡Eres Mente Claret!':'¡Reto superado!';
   const W=worlds[worldIndexForLevel(s.index)],done=s.index%10+1;
   detail.textContent=practice?(s.index===0?'Ya dominas el primer tablero. Vamos al siguiente.':'Ya puedes comenzar tu viaje.'):
-    `${'★'.repeat(s.round.lives)} · ${W.place} · ${done}/10 retos completados${done<10?` · A ${10-done} del rango ${W.rank}`:` · Rango ${W.rank} conseguido`}`;
+    `${W.place} · ${done}/10 retos completados${done<10?` · A ${10-done} del rango ${W.rank}`:` · Rango ${W.rank} conseguido`}`;
   $('#message').className='message success victory-message';$('#message').replaceChildren(title,detail);
+  if(!practice){const stars=document.createElement('span');stars.className='victory-stars';stars.textContent='★'.repeat(s.round.lives)+'☆'.repeat(3-s.round.lives);stars.setAttribute('aria-label',`${s.round.lives} de 3 estrellas`);$('#message').prepend(stars);}
 }
 function react(kind,text){
   const box=$('#claretReaction');clearTimeout(reactionTimer);box.className=`claret-reaction ${kind}`;$('#reactionText').textContent=text;box.hidden=false;
@@ -183,9 +184,9 @@ function showHint(){
   pendingHint=h;
   if(h.type==='review'||h.type==='conflict'){highlights=h.cells;$('#hintText').textContent=h.reason;}
   else if(stage===1){highlights=h.steps?.[0]?.group.cells??h.group.cells;$('#hintText').textContent=`Observa la ${h.steps?.[0]?.group.kind??h.group.kind} ${(h.steps?.[0]?.group.index??h.group.index)+1}. Vamos a encontrar un Claret seguro, sin adivinar.`;}
-  else if(stage<maxStage){const step=h.steps?.[stage-2];if(step){highlights=[];hintSource=step.candidates;hintExcluded=step.removed;$('#hintText').textContent=`Paso ${stage-1}/${h.steps.length}: el Claret de la ${step.group.kind} ${step.group.index+1} tiene que estar en una casilla con borde azul. Cualquiera de esas posiciones entra en conflicto con las casillas de borde naranja: podemos descartarlas. Pulsa «Explícame más» para seguir.`;}else{highlights=h.cells;$('#hintText').textContent=h.explanation;}}
+  else if(stage<maxStage){const step=h.steps?.[stage-2];if(step){highlights=[];hintSource=step.candidates;hintExcluded=step.removed;$('#hintText').textContent=`Paso ${stage-1}/${h.steps.length}: el Claret de la ${step.group.kind} ${step.group.index+1} tiene que estar en una casilla con borde azul. Las casillas rayadas en naranja chocan con todas esas opciones: descártalas.`;}else{highlights=h.cells;$('#hintText').textContent=h.explanation;}}
   else{highlights=[h.target];$('#hintText').textContent=h.reason+' Colócalo tú con doble toque. Esta explicación no gasta otra ayuda.';}
-  $('#hintText').hidden=false;persist();drawBoard();play('logical',state.sound);
+  $('#hintText').hidden=false;$('.feedback-slot').scrollTop=0;persist();drawBoard();play('logical',state.sound);
 }
 function check(){
   const s=current();if(s.round.lives===0){retryLevel();return;}if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}

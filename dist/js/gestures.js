@@ -2,9 +2,9 @@
 export function gestureSession({read,write,place,now=()=>performance.now()}){
   let stroke=null,lastTap=null;
   return {
-    down(id,cell){if(stroke||cell==null)return false;stroke={id,start:cell,visited:new Set(),drag:false,value:read(cell)==='x'?null:'x'};return true;},
-    move(id,cells){if(!stroke||stroke.id!==id)return;const next=cells.filter(k=>k!=null);if(next.some(k=>k!==stroke.start))stroke.drag=true;if(!stroke.drag)return;lastTap=null;for(const k of [stroke.start,...next])if(!stroke.visited.has(k)){stroke.visited.add(k);if(read(k)!=='c')write(k,stroke.value);}},
-    up(id,cell){if(!stroke||stroke.id!==id)return;const s=stroke;stroke=null;if(s.drag||cell!==s.start)return;const time=now();if(lastTap?.cell===cell&&time-lastTap.time<360){lastTap=null;place(cell);}else{lastTap={cell,time};if(read(cell)!=='c')write(cell,read(cell)==='x'?null:'x');}},
+    down(id,cell){if(stroke||cell==null)return false;stroke={id,start:cell,started:now(),visited:new Set(),drag:false,value:read(cell)==='x'?null:'x'};return true;},
+    move(id,cells){if(!stroke||stroke.id!==id)return;const next=cells.filter(k=>k!=null);if(next.some(k=>k!==stroke.start))stroke.drag=true;if(!stroke.drag)return;lastTap=null;for(const k of [stroke.start,...next])if(!stroke.visited.has(k)){stroke.visited.add(k);if(!['c','e'].includes(read(k)))write(k,stroke.value);}},
+    up(id,cell){if(!stroke||stroke.id!==id)return;const s=stroke;stroke=null;if(s.drag||cell!==s.start){lastTap=null;return;}const time=now();if(time-s.started>500){lastTap=null;return;}if(lastTap?.cell===cell&&time-lastTap.time<360){lastTap=null;place(cell);}else{lastTap={cell,time};if(!['c','e'].includes(read(cell)))write(cell,read(cell)==='x'?null:'x');}},
     cancel(){stroke=null;lastTap=null;}
   };
 }
