@@ -1,8 +1,8 @@
 {
-  "audited": 102,
-  "tutorials": 2,
+  "audited": 103,
+  "tutorials": 3,
   "levels": 100,
-  "passed": 102,
+  "passed": 103,
   "issues": [],
   "sizes": [
     4,
@@ -23,7 +23,7 @@
       "connected": true,
       "referenceValid": true,
       "pedagogical": true,
-      "rating": 58
+      "rating": 4
     },
     {
       "kind": "práctica",
@@ -34,7 +34,18 @@
       "connected": true,
       "referenceValid": true,
       "pedagogical": true,
-      "rating": 58
+      "rating": 4
+    },
+    {
+      "kind": "práctica",
+      "level": 3,
+      "size": 4,
+      "solutions": 1,
+      "capped": false,
+      "connected": true,
+      "referenceValid": true,
+      "pedagogical": true,
+      "rating": 19
     },
     {
       "kind": "reto",

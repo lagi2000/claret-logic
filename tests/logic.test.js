@@ -5,7 +5,7 @@ import {solve} from '../scripts/solver.mjs';
 import {connectedRegions,autoMarks,diagnose,conflictRules} from '../dist/js/engine.js';
 import {deductions,nextHint} from '../dist/js/pedagogy.js';
 
-test('Las dos prácticas 4×4 aplican las tres reglas y tienen solución única',()=>{for(const L of tutorials){assert.equal(L.size,4);assert.deepEqual(L.activeRules,['region','rowcol','touch']);assert.equal(solve(L,100).count,1);}});
+test('Las tres prácticas 4×4 aplican las tres reglas y tienen solución única',()=>{for(const L of tutorials){assert.equal(L.size,4);assert.deepEqual(L.activeRules,['region','rowcol','touch']);assert.equal(solve(L,100).count,1);}});
 for(const L of levels)test(`Reto ${L.n}: unicidad, conexión, referencia y prueba deductiva`,()=>{
  const s=solve(L);assert.equal(s.count,1);assert.ok(connectedRegions(L));
  assert.deepEqual(s.solutions[0],L.solution.map((c,r)=>r*L.size+c));

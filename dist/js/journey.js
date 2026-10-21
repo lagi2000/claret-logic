@@ -12,7 +12,7 @@ export function journeyStatus(state){
 
 export function solvedActionLabel({practice=false,index=0,onboarding=false,milestone=false}={}){
   if(practice){
-    if(index===0)return 'Siguiente práctica';
+    if(index<2)return 'Siguiente práctica';
     return onboarding?'Empezar los retos':'Volver a mi partida';
   }
   return milestone?'Ver logro':'Ver recorrido';

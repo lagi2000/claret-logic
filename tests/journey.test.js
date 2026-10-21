@@ -39,8 +39,8 @@ test('Un reto no resuelto nunca adelanta el recorrido',()=>{
 
 test('Los botones resueltos describen correctamente el siguiente destino',()=>{
   assert.equal(solvedActionLabel({practice:true,index:0,onboarding:true}),'Siguiente práctica');
-  assert.equal(solvedActionLabel({practice:true,index:1,onboarding:true}),'Empezar los retos');
-  assert.equal(solvedActionLabel({practice:true,index:1,onboarding:false}),'Volver a mi partida');
+  assert.equal(solvedActionLabel({practice:true,index:2,onboarding:true}),'Empezar los retos');
+  assert.equal(solvedActionLabel({practice:true,index:2,onboarding:false}),'Volver a mi partida');
   assert.equal(solvedActionLabel({milestone:true}),'Ver logro');
   assert.equal(solvedActionLabel({}),'Ver recorrido');
 });

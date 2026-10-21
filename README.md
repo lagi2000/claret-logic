@@ -1,12 +1,12 @@
-# Claret Logic · 3.13.0
+# Claret Logic · 3.15.0
 
 Controles directos: tocar o arrastrar marca cruces; arrastrar desde una cruz las borra; doble toque coloca o retira Claret. Teclado: flechas, C y X. Al resolver se comprueba automáticamente. Nueva campaña de 4×4 a 10×10, con 9×9 en el reto 9. La actualización conserva los logros y reinicia solo el tablero en curso de la campaña anterior, porque sus regiones han cambiado.
 
-Dos prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Cada mundo combina seis retos clásicos con «Claret ya ha empezado», «La jugada lógica», «Detecta al intruso» y un gran reto final. La cuadrícula mantiene el protagonismo con límites de región limpios, reacciones de Claret y consecuencias visuales sin revelar soluciones. Esta versión incorpora postales de entrada a cada destino, respuesta táctil reforzada, celebraciones graduadas, álbum visual de viaje y tarjetas familiares descargables. La racha diaria dispone de acceso permanente y apertura automática cuando está pendiente. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución.
+Tres prácticas iniciales y **100 retos certificados de solución única**, organizados en un recorrido visual de diez mundos. Cada mundo combina seis retos clásicos con «Claret ya ha empezado», «La jugada lógica», «Detecta al intruso» y un gran reto final. La cuadrícula mantiene el protagonismo con límites de región limpios, reacciones de Claret y consecuencias visuales sin revelar soluciones. Esta versión incorpora postales de entrada a cada destino, respuesta táctil reforzada, celebraciones graduadas, álbum visual de viaje y tarjetas familiares descargables. La racha diaria dispone de acceso permanente y apertura automática cuando está pendiente. Juego estático sin cuentas, base de datos, analítica ni dependencias de ejecución.
 
 Las actualizaciones se descargan en segundo plano sin interrumpir la partida ni cerrar sus ventanas. La edición nueva aparece al abrir el juego de nuevo. La página y los módulos se sirven siempre desde la misma versión almacenada para evitar mezclas durante una actualización. Si un navegador móvil conserva una edición anterior, `actualizar.html` limpia únicamente los recursos web de Claret Logic y mantiene intacto el progreso guardado.
 
-El certificado lógico estricto pasa: 100/100 retos con una solución, regiones conectadas, traza de deducción sin adivinación y **100 disposiciones de respuesta distintas dentro de su tamaño**. Las dos prácticas 4×4 son independientes, tienen solución única y aplican desde el inicio las tres reglas completas.
+El certificado lógico estricto pasa: 100/100 retos con una solución, regiones conectadas, traza de deducción sin adivinación y **100 disposiciones de respuesta distintas dentro de su tamaño**. Las tres prácticas 4×4 son independientes, tienen solución única y aplican desde el inicio las tres reglas completas.
 
 ## Probar y publicar
 

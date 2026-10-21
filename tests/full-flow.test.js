@@ -15,7 +15,7 @@ test('Una partida de principio a fin atraviesa prácticas, 100 retos, diez logro
     for(const [row,column] of L.solution.entries())practice.round.marks[row*L.size+column]='c';
     assert.equal(diagnose(L,practice.round.marks).ok,true);
     practice.round.solved=true;
-    assert.equal(advanceTutorial(state,practice,true),i===0);
+    assert.equal(advanceTutorial(state,practice,true),i<tutorials.length-1);
   }
   assert.equal(state.tutorialDone,true);
   assert.equal(state.completed,0);

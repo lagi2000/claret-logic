@@ -1,7 +1,7 @@
 import {levels} from './levels.js';
 import {bindBoardGestures} from './gestures.js';
 import {bindMapSwipe} from './map-swipe.js';
-import {tutorials} from './tutorials.js';
+import {tutorials,tutorialGuide} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
 import {teachingHint,advanceLesson} from './teaching.js';
 import {KEY,recoverRoundScore,attemptClaret,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
@@ -55,7 +55,7 @@ function victoryMessage(){
   const s=current(),title=document.createElement('strong'),detail=document.createElement('small');
   title.textContent=practice?'¡Práctica superada!':s.index===99?'¡Eres Mente Claret!':'¡Reto superado!';
   const W=worlds[worldIndexForLevel(s.index)],done=s.index%10+1;
-  detail.textContent=practice?(s.index===0?'Ya dominas el primer tablero. Vamos al siguiente.':'Ya puedes comenzar tu viaje.'):
+  detail.textContent=practice?(s.index<2?'Ya dominas este paso. Vamos al siguiente.':'Ya puedes comenzar tu viaje.'):
     `${W.place} · ${done}/10 retos completados${done<10?` · A ${10-done} del rango ${W.rank}`:` · Rango ${W.rank} conseguido`}`;
   $('#message').className='message success victory-message';$('#message').replaceChildren(title,detail);
   if(!practice){const stars=document.createElement('span');stars.className='victory-stars';stars.textContent='★'.repeat(s.round.lives)+'☆'.repeat(3-s.round.lives);stars.setAttribute('aria-label',`${s.round.lives} de 3 estrellas`);$('#message').prepend(stars);}
@@ -76,10 +76,10 @@ function pulseConsequences(origin,L){
 }
 function stats(){
   $('.play').classList.toggle('is-solved',current().round.solved);
-  const s=current(),L=level();$('#level').textContent=L.n;$('#levelLabel').textContent=practice?'Práctica':'Reto';$('#levelTotal').textContent=practice?' / 2':' / 100';$('#difficulty').textContent=practice?'PRÁCTICA · TUTORIAL':L.difficulty.toLocaleUpperCase('es');
+  const s=current(),L=level();$('#level').textContent=L.n;$('#levelLabel').textContent=practice?'Práctica':'Reto';$('#levelTotal').textContent=practice?' / '+tutorials.length:' / 100';$('#difficulty').textContent=practice?'PRÁCTICA · TUTORIAL':L.difficulty.toLocaleUpperCase('es');
   $('#rank').textContent=earnedRank(state.completed);$('#progress').value=state.completed;
   $('#lives').textContent='♥ '.repeat(s.round.lives).trim();$('#lives').setAttribute('aria-label',`${s.round.lives} vidas`);
-  $('#helps').textContent=state.helps;$('#streak').textContent=state.streak;$('#size').textContent=`${L.size} × ${L.size}`;
+  $('#helps').textContent=state.helps;$('#streak').textContent=state.streak;$('#size').textContent=practice?L.title:`${L.size} × ${L.size}`;
   $('#count').textContent=`${Object.values(s.round.marks).filter(v=>v==='c').length}/${L.size}`;
   const mission=practice?null:missionFor(s.index,L);
   $('#missionTag').hidden=!mission;$('#missionTag').textContent=mission?.title??'';
@@ -100,7 +100,7 @@ function stats(){
   $('#play').setAttribute('aria-label',state.tutorialDone?'Continuar partida':'Jugar');
 }
 function drawBoard(){
-  const s=current(),L=level(),n=L.size,mission=practice?null:missionFor(s.index,L),auto=practice?autoMarks(L,s.round.marks):new Set();
+  const s=current(),L=level(),n=L.size,mission=practice?null:missionFor(s.index,L),auto=practice&&practice.index<2?autoMarks(L,s.round.marks):new Set();
   board.replaceChildren();board.style.gridTemplateColumns=`repeat(${n},minmax(0,1fr))`;board.style.gridTemplateRows=`repeat(${n},minmax(0,1fr))`;board.setAttribute('aria-label',`Tablero de ${n} filas y ${n} columnas`);
   for(let k=0;k<n*n;k++) {
     const r=Math.floor(k/n),c=k%n,region=L.regions[r][c],v=s.round.marks[k],isX=v!=='c'&&(v==='x'||v==='e'||auto.has(k));
@@ -131,12 +131,24 @@ function redraw(){
   drawBoard();setTool(tool);
   message(s.round.lives===0?'Has perdido este intento. Reintenta el mismo nivel con tres vidas.':s.round.solved?'¡Reto superado! Puedes continuar.':mission?.type==='intruder'?'Compara los dos Claret. Uno de ellos rompe una norma.':mission?.type==='logical'?'Busca primero una deducción completamente segura.':'Elige una casilla para empezar.',s.round.solved?'success':'');
   if(s.round.solved)victoryMessage();
+  else updateTutorialGuide();
+}
+function updateTutorialGuide(){
+  if(!practice||practice.round.solved||practice.round.lives===0)return;
+  const L=level(),placed=Object.values(practice.round.marks).filter(v=>v==='c').length;
+  if(practice.index===0){
+    const guide=tutorialGuide(L,practice.round.marks);
+    if(guide){highlights=guide.cells;drawBoard();message(guide.text);}
+  }else if(!placed)message(L.tip);
 }
 function mark(k){
   const s=current();if(s.round.solved||s.round.lives===0)return;
   focusCell=k;const marks=s.round.marks,L=level(),mission=practice?null:missionFor(s.index,L),gate=missionGate(mission,marks,tool,k),auto=practice?autoMarks(L,marks):new Set();
   if(marks[k]==='e'){message('Esta casilla ya está descartada por un fallo.');return;}
   const deductionBefore=tool==='c'?teachingHint(L,marks):null;
+  if(practice?.index===0&&tool==='c'&&marks[k]!=='c'&&L.solution[Math.floor(k/L.size)]!==k%L.size){
+    updateTutorialGuide();message('Vamos paso a paso. '+tutorialGuide(L,marks).text);return;
+  }
   const logicalBefore=mission?.type==='logical'&&missionProgress(mission,marks)==='Primera deducción conseguida';
   if(gate){highlights=mission?.type==='intruder'?[...mission.fixed,mission.intruder]:mission?.fixed??[];drawBoard();message(gate,'error');react('worry','Revisa esa relación');play('error',state.sound);return;}
   if(tool==='x'&&marks[k]==='c'){message('Selecciona Claret para retirar esa figura.');react('worry','Primero cambia de herramienta');return;}
@@ -163,6 +175,7 @@ function mark(k){
     if(result.ok)check();
     else if(result.cells?.length){highlights=result.cells;drawBoard();message(result.message,'error');play('error',state.sound);}
   }
+  if(practice?.index===0)updateTutorialGuide();
 }
 const cancelGesture=bindBoardGestures(board,{
   size:()=>level().size,enabled:()=>!screens.game.hidden&&!current().round.solved&&current().round.lives>0&&!document.querySelector('dialog[open]'),

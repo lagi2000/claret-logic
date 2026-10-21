@@ -33,12 +33,12 @@ export function upgradeCampaign(s,levels){
 export const ranks=['Explorador','Aprendiz','Observador','Estratega','Experto','Maestro','Mente brillante','Genio lógico','Gran estratega','Mente Claret'];
 const integer=(v,min,max,fallback)=>Number.isInteger(v)&&v>=min&&v<=max?v:fallback;
 const clone=value=>typeof globalThis.structuredClone==='function'?globalThis.structuredClone(value):JSON.parse(JSON.stringify(value));
-export function fresh(){return {version:4,victories:0,defeats:0,stars:{},campaignRevision:CAMPAIGN_REVISION,tutorialRevision:2,tutorialDone:false,tutorialIndex:0,tutorialRound:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false},index:0,completed:0,helps:3,streak:0,sound:true,daily:{last:'',current:0,best:0},seenWorlds:[],celebratedWorlds:[],round:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false}};}
+export function fresh(){return {version:4,victories:0,defeats:0,stars:{},campaignRevision:CAMPAIGN_REVISION,tutorialRevision:3,tutorialDone:false,tutorialIndex:0,tutorialRound:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false},index:0,completed:0,helps:3,streak:0,sound:true,daily:{last:'',current:0,best:0},seenWorlds:[],celebratedWorlds:[],round:{marks:{},lives:3,usedHelp:false,helpStep:0,solved:false}};}
 export function normalize(raw) {
   const s=fresh();if(!raw||typeof raw!=='object')return s;
   s.campaignRevision=integer(raw.campaignRevision,0,CAMPAIGN_REVISION,0);
-  s.tutorialDone=raw.tutorialDone===true;s.tutorialIndex=integer(raw.tutorialIndex,0,1,0);
-  if(raw.tutorialRevision===2&&raw.tutorialRound&&typeof raw.tutorialRound==='object'){
+  s.tutorialDone=raw.tutorialDone===true;s.tutorialIndex=raw.tutorialRevision===3?integer(raw.tutorialIndex,0,2,0):0;
+  if(raw.tutorialRevision===3&&raw.tutorialRound&&typeof raw.tutorialRound==='object'){
     const t=raw.tutorialRound;
     s.tutorialRound={marks:Object.fromEntries(Object.entries(t.marks??{}).filter(([k,v])=>/^\d+$/.test(k)&&+k<16&&['c','x','e'].includes(v))),lives:integer(t.lives,0,3,3),usedHelp:t.usedHelp===true,helpStep:integer(t.helpStep,0,100,0),solved:t.solved===true};
   }
@@ -79,7 +79,7 @@ export function migrateV3(raw){
 export function beginTutorial(s,replay=false){return {index:replay?0:s.tutorialIndex,round:replay?fresh().round:clone(s.tutorialRound),completed:0,helps:3,streak:0};}
 export function advanceTutorial(s,practice,onboarding){
   if(!practice.round.solved)return false;
-  if(practice.index===0){practice.index=1;practice.round=fresh().round;if(onboarding){s.tutorialIndex=1;s.tutorialRound=clone(practice.round);}return true;}
+  if(practice.index<2){practice.index++;practice.round=fresh().round;if(onboarding){s.tutorialIndex=practice.index;s.tutorialRound=clone(practice.round);}return true;}
   if(onboarding){s.tutorialDone=true;s.tutorialIndex=1;s.tutorialRound=clone(practice.round);}return false;
 }
 export function save(storage,state){try{
