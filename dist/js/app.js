@@ -238,7 +238,7 @@ function renderDaily(){
   const now=new Date(),today=dateKey(now),monday=new Date(now);monday.setDate(now.getDate()-(now.getDay()+6)%7);
   const dates=activeDates(state.daily);$('#week').replaceChildren();
   ['LUN','MAR','MIÉ','JUE','VIE','SÁB','DOM'].forEach((name,i)=>{const d=new Date(monday);d.setDate(monday.getDate()+i);const key=dateKey(d),el=document.createElement('span'),b=document.createElement('b');el.textContent=name;b.className=(dates.has(key)?'on ':'')+(key===today?'today':'');b.textContent=dates.has(key)?'✓':'·';el.setAttribute('aria-label',`${key}: ${dates.has(key)?'racha activada':'sin activación'}`);el.append(b);$('#week').append(el);});
-  const activated=state.daily.last>=today;$('#dailyContinue').disabled=!activated;$('#heart').disabled=activated;$('#heart').classList.toggle('lit',activated);$('#dailyMessage').textContent=activated?'Tu corazón de María ya está encendido hoy.':'Un pequeño gesto para comenzar.';
+  const activated=state.daily.last>=today;$('#dailyContinue').disabled=false;$('#dailyContinue').textContent=activated?'Continuar':'Activar mi racha';$('#heart').disabled=activated;$('#heart').classList.toggle('lit',activated);$('#dailyMessage').textContent=activated?'¡Racha de hoy activada! Ya puedes continuar.':'Pulsa «Activar mi racha» o toca el corazón.';
 }
 function openDaily(automatic=false){
   automatic=automatic===true;
@@ -247,7 +247,7 @@ function openDaily(automatic=false){
   if($('#worldIntro').open||$('#achievement').open||$('#rules').open||$('#collection').open||$('#journeyOverview').open)return false;
   if($('#missionIntro').open){$('#missionIntro').close();introducedMissions.delete(state.index);}
   clearTimeout(dailyTimer);dailyTimer=0;dailyReturnFocus=document.activeElement;renderDaily();
-  $('#dailyBackdrop').hidden=false;$('#daily').show();$('#heart').focus({preventScroll:true});return true;
+  $('#dailyBackdrop').hidden=false;$('#daily').show();$('#dailyContinue').focus({preventScroll:true});return true;
 }
 function closeDaily(resume=true){
   const wasOpen=$('#daily').open;if(wasOpen)$('#daily').close();$('#dailyBackdrop').hidden=true;repairActiveScreen();
@@ -401,7 +401,7 @@ function retryLevel(){if(!resetRound(current()))return;cancelGesture();persist()
 $('#reset').onclick=retryLevel;
 $('#sound').onclick=()=>{state.sound=!state.sound;persist();stats();play('place',state.sound);};
 $('#heart').onclick=()=>{const previousBest=state.daily.best,result=activateDay(state);persist();renderDaily();stats();if(result.changed){$('#heart').classList.add('lit');$('#dailyMessage').textContent=result.reward?'Has recuperado una ayuda. ¡Racha encendida!':state.daily.best>previousBest&&previousBest>0?`¡Nuevo récord: ${state.daily.best} días! Vuelve mañana.`:'Racha encendida. Vuelve mañana para continuar.';play('heart',state.sound);haptic();$('#dailyContinue').focus();}};
-$('#dailyContinue').onclick=()=>closeDaily();
+$('#dailyContinue').onclick=()=>{if(state.daily.last<dateKey())$('#heart').click();else closeDaily();};
 $('#dailySkip').onclick=()=>closeDaily();$('#dailyClose').onclick=()=>closeDaily();$('#dailyBackdrop').onclick=()=>closeDaily();
 document.addEventListener('keydown',e=>{if(e.key!=='Escape')return;if($('#daily').open){e.preventDefault();closeDaily();}else if(!$('#installOverlay').hidden){e.preventDefault();closeInstallGuide();}});
 window.addEventListener('storage',event=>{if(event.key!==KEY||!event.newValue)return;try{
