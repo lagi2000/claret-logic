@@ -2,6 +2,18 @@ import {groups,conflictRules,diagnose} from './engine.js';
 import {deductions} from './pedagogy.js';
 import {spendHint} from './state.js';
 const proofs=new WeakMap();
+export function conflictExplanation(L,a,b){
+ const rule=conflictRules(L,a,b)[0];
+ const at=k=>`fila ${Math.floor(k/L.size)+1}, columna ${k%L.size+1}`;
+ return `${at(a)} ${rule==='contacto'?'toca':`comparte ${rule} con`} ${at(b)}`;
+}
+export function lessonSteps(L,h,marks){
+ if(h.type!=='place')return [];
+ const placed=Object.keys(marks).map(Number).filter(k=>marks[k]==='c');
+ const direct=h.blocked.flatMap(k=>{const q=placed.find(q=>conflictRules(L,k,q).length);return q===undefined?[]:[{candidates:[q],removed:[k],reason:`Descarta esta casilla: ${conflictExplanation(L,k,q)}. El borde azul señala el Claret que lo demuestra.`}];});
+ const deductions=(h.steps??[]).flatMap(step=>step.removed.map(k=>({...step,removed:[k],reason:`La casilla rayada no puede contener a Claret: ${step.candidates.map(q=>conflictExplanation(L,k,q)).join('; ')}. Entraría en conflicto con cualquiera de las opciones azules, y una de ellas debe ocuparse.`})));
+ return [...deductions,...direct];
+}
 export function teachingHint(L,marks){
  const diagnosis=diagnose(L,marks);if(diagnosis.ok)return null;
  if(diagnosis.conflict)return {type:'conflict',target:diagnosis.cells[0],cells:diagnosis.cells,reason:diagnosis.message};

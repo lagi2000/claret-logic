@@ -13,7 +13,7 @@ function storedResults(storage){try{return JSON.parse(storage.getItem(RESULTS_KE
 export function recoverRoundScore(s){
   if(s.round.solved&&s.round.lives>0&&s.index<s.completed)s.stars[s.index]=Math.max(s.stars[s.index]??0,s.round.lives);
 }
-export const CAMPAIGN_REVISION=20261011;
+export const CAMPAIGN_REVISION=20261023;
 export function attemptClaret(s,L,k){
   if(s.round.solved||s.round.lives===0||s.round.marks[k]==='e')return 'blocked';
   if(s.round.marks[k]==='c'){delete s.round.marks[k];return 'removed';}

@@ -15,5 +15,5 @@ export function solvedActionLabel({practice=false,index=0,onboarding=false,miles
     if(index<2)return 'Siguiente práctica';
     return onboarding?'Empezar los retos':'Volver a mi partida';
   }
-  return milestone?'Ver logro':'Ver recorrido';
+  return milestone?'Ver logro':(index+1)%10===0?'Ver recorrido':'Siguiente reto';
 }

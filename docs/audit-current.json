@@ -61,13 +61,13 @@
     {
       "kind": "reto",
       "level": 2,
-      "size": 5,
+      "size": 4,
       "solutions": 1,
       "capped": false,
       "connected": true,
       "referenceValid": true,
       "pedagogical": true,
-      "rating": 5
+      "rating": 58
     },
     {
       "kind": "reto",
@@ -83,62 +83,18 @@
     {
       "kind": "reto",
       "level": 4,
-      "size": 6,
+      "size": 5,
       "solutions": 1,
       "capped": false,
       "connected": true,
       "referenceValid": true,
       "pedagogical": true,
-      "rating": 19
+      "rating": 5
     },
     {
       "kind": "reto",
       "level": 5,
-      "size": 6,
-      "solutions": 1,
-      "capped": false,
-      "connected": true,
-      "referenceValid": true,
-      "pedagogical": true,
-      "rating": 19
-    },
-    {
-      "kind": "reto",
-      "level": 6,
-      "size": 7,
-      "solutions": 1,
-      "capped": false,
-      "connected": true,
-      "referenceValid": true,
-      "pedagogical": true,
-      "rating": 33
-    },
-    {
-      "kind": "reto",
-      "level": 7,
-      "size": 7,
-      "solutions": 1,
-      "capped": false,
-      "connected": true,
-      "referenceValid": true,
-      "pedagogical": true,
-      "rating": 33
-    },
-    {
-      "kind": "reto",
-      "level": 8,
-      "size": 8,
-      "solutions": 1,
-      "capped": false,
-      "connected": true,
-      "referenceValid": true,
-      "pedagogical": true,
-      "rating": 8
-    },
-    {
-      "kind": "reto",
-      "level": 9,
-      "size": 9,
+      "size": 5,
       "solutions": 1,
       "capped": false,
       "connected": true,
@@ -148,14 +104,58 @@
     },
     {
       "kind": "reto",
-      "level": 10,
-      "size": 9,
+      "level": 6,
+      "size": 5,
       "solutions": 1,
       "capped": false,
       "connected": true,
       "referenceValid": true,
       "pedagogical": true,
-      "rating": 37
+      "rating": 97
+    },
+    {
+      "kind": "reto",
+      "level": 7,
+      "size": 6,
+      "solutions": 1,
+      "capped": false,
+      "connected": true,
+      "referenceValid": true,
+      "pedagogical": true,
+      "rating": 19
+    },
+    {
+      "kind": "reto",
+      "level": 8,
+      "size": 6,
+      "solutions": 1,
+      "capped": false,
+      "connected": true,
+      "referenceValid": true,
+      "pedagogical": true,
+      "rating": 19
+    },
+    {
+      "kind": "reto",
+      "level": 9,
+      "size": 7,
+      "solutions": 1,
+      "capped": false,
+      "connected": true,
+      "referenceValid": true,
+      "pedagogical": true,
+      "rating": 33
+    },
+    {
+      "kind": "reto",
+      "level": 10,
+      "size": 8,
+      "solutions": 1,
+      "capped": false,
+      "connected": true,
+      "referenceValid": true,
+      "pedagogical": true,
+      "rating": 8
     },
     {
       "kind": "reto",

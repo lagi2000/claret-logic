@@ -3,7 +3,7 @@ import {bindBoardGestures} from './gestures.js';
 import {bindMapSwipe} from './map-swipe.js';
 import {tutorials,tutorialGuide} from './tutorials.js';
 import {autoMarks,diagnose,groups} from './engine.js';
-import {teachingHint,advanceLesson} from './teaching.js';
+import {teachingHint,advanceLesson,lessonSteps} from './teaching.js';
 import {KEY,recoverRoundScore,attemptClaret,upgradeCampaign,beginTutorial,advanceTutorial,fresh,load,save,normalize,resetRound,complete,spendHint,nextLevel,dateKey,activateDay,earnedRank,activeDates} from './state.js';
 import {play,haptic,celebrate} from './feedback.js';
 import {worlds,routePoints,worldIndexForLevel,unlockedWorldIndex} from './worlds.js';
@@ -76,6 +76,7 @@ function pulseConsequences(origin,L){
 }
 function stats(){
   $('.play').classList.toggle('is-solved',current().round.solved);
+  $('#viewRoute').hidden=!!practice||!current().round.solved;
   const s=current(),L=level();$('#level').textContent=L.n;$('#levelLabel').textContent=practice?'Práctica':'Reto';$('#levelTotal').textContent=practice?' / '+tutorials.length:' / 100';$('#difficulty').textContent=practice?'PRÁCTICA · TUTORIAL':L.difficulty.toLocaleUpperCase('es');
   $('#rank').textContent=earnedRank(state.completed);$('#progress').value=state.completed;
   $('#lives').textContent='♥ '.repeat(s.round.lives).trim();$('#lives').setAttribute('aria-label',`${s.round.lives} vidas`);
@@ -192,20 +193,21 @@ function showHint(){
   const s=current(),L=level();if(s.round.solved||s.round.lives===0)return;
   const h=teachingHint(L,s.round.marks);if(!h){message('El tablero ya está resuelto.');return;}
   const key=JSON.stringify(Object.entries(s.round.marks).sort(([a],[b])=>Number(a)-Number(b)));
-  const maxStage=Math.max(3,(h.steps?.length??0)+2),stage=advanceLesson(s,key,!!practice,maxStage);if(!stage)return;
+  const steps=lessonSteps(L,h,s.round.marks);
+  const maxStage=Math.max(3,steps.length+2),stage=advanceLesson(s,key,!!practice,maxStage);if(!stage)return;
   hintSource=[];hintExcluded=[];
   pendingHint=h;
   if(h.type==='review'||h.type==='conflict'){highlights=h.cells;$('#hintText').textContent=h.reason;}
   else if(stage===1){highlights=h.steps?.[0]?.group.cells??h.group.cells;$('#hintText').textContent=`Observa la ${h.steps?.[0]?.group.kind??h.group.kind} ${(h.steps?.[0]?.group.index??h.group.index)+1}. Vamos a encontrar un Claret seguro, sin adivinar.`;}
-  else if(stage<maxStage){const step=h.steps?.[stage-2];if(step){highlights=[];hintSource=step.candidates;hintExcluded=step.removed;$('#hintText').textContent=`Paso ${stage-1}/${h.steps.length}: el Claret de la ${step.group.kind} ${step.group.index+1} tiene que estar en una casilla con borde azul. Las casillas rayadas en naranja chocan con todas esas opciones: descártalas.`;}else{highlights=h.cells;$('#hintText').textContent=h.explanation;}}
+  else if(stage<maxStage){const step=steps[stage-2];if(step){highlights=[];hintSource=step.candidates;hintExcluded=step.removed;$('#hintText').textContent=step.reason;}else{highlights=h.cells;$('#hintText').textContent=h.explanation;}}
   else{highlights=[h.target];$('#hintText').textContent=h.reason+' Colócalo tú con doble toque. Esta explicación no gasta otra ayuda.';}
   $('#hintText').hidden=false;$('.feedback-slot').scrollTop=0;persist();drawBoard();play('logical',state.sound);
 }
 function check(){
   const s=current();if(s.round.lives===0){retryLevel();return;}if(s.round.solved){if(practice){const more=advanceTutorial(state,practice,onboarding);persist();if(!more){leavePractice();return;}redraw();board.focus();return;}
-    if(s.index+1<s.completed||(s.index+1===s.completed&&s.celebratedWorlds.includes(Math.floor(s.index/10)))){s.index=Math.min(99,s.completed);s.round=fresh().round;if(s.completed===100){s.round.marks=Object.fromEntries(levels[99].solution.map((c,r)=>[r*levels[99].size+c,'c']));s.round.solved=true;}persist();openMap();return;}
     if(journeyStatus(state).kind==='achievement'){pendingAchievement=worldIndexForLevel(state.index);openAchievement();return;}
-    if(nextLevel(s))persist();openMap();return;}
+    if((s.index+1)%10===0){openMap();return;}
+    if(nextLevel(s)){persist();startGame();}else openMap();return;}
   const result=diagnose(level(),s.round.marks);highlights=result.cells;
   if(result.ok){
     const helpsBefore=s.helps;
@@ -397,6 +399,7 @@ $('#how').onclick=()=>$('#rules').showModal();$('#help').onclick=()=>$('#rules')
 $('[data-close="rules"]').onclick=()=>$('#rules').close();
 $('#tutorial').onclick=()=>{onboarding=!state.tutorialDone;practice=beginTutorial(state,!onboarding);redraw();startGame();};$('#leavePractice').onclick=leavePractice;
 $('#toolClaret').onclick=()=>setTool('c');$('#toolX').onclick=()=>setTool('x');$('#hint').onclick=showHint;$('#check').onclick=check;
+$('#viewRoute').onclick=()=>openMap();
 function retryLevel(){if(!resetRound(current()))return;cancelGesture();persist();redraw();message('Nuevo intento: tres vidas. ¡Vamos a pensar!');board.focus();}
 $('#reset').onclick=retryLevel;
 $('#sound').onclick=()=>{state.sound=!state.sound;persist();stats();play('place',state.sound);};

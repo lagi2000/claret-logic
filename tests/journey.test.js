@@ -42,5 +42,6 @@ test('Los botones resueltos describen correctamente el siguiente destino',()=>{
   assert.equal(solvedActionLabel({practice:true,index:2,onboarding:true}),'Empezar los retos');
   assert.equal(solvedActionLabel({practice:true,index:2,onboarding:false}),'Volver a mi partida');
   assert.equal(solvedActionLabel({milestone:true}),'Ver logro');
-  assert.equal(solvedActionLabel({}),'Ver recorrido');
+  assert.equal(solvedActionLabel({}),'Siguiente reto');
+  assert.equal(solvedActionLabel({index:99}),'Ver recorrido');
 });

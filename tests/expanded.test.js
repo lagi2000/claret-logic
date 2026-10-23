@@ -3,8 +3,8 @@ import assert from 'node:assert/strict';
 import {levels} from '../dist/js/levels.js';
 import {fresh,normalize,upgradeCampaign,CAMPAIGN_REVISION} from '../dist/js/state.js';
 import {diagnose} from '../dist/js/engine.js';
-test('La campaña llega a 9×9 en el nivel 9 y a 10×10 antes del 48',()=>{
- assert.equal(levels[8].size,9);assert.equal(levels[47].size,10);
+test('La iniciación crece gradualmente y conserva los tableros avanzados',()=>{
+ assert.deepEqual(levels.slice(0,10).map(L=>L.size),[4,4,5,5,5,5,6,6,7,8]);assert.equal(levels[47].size,10);
  assert.ok(levels.every(L=>L.size>=4&&L.size<=10));
 });
 test('Migrar campaña conserva premios pero no marcas de regiones antiguas',()=>{

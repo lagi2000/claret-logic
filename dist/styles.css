@@ -175,7 +175,10 @@ dialog:not([open]){display:none!important}
 
 /* A clear finish: keep the solved puzzle visible and give continuation priority. */
 .play.is-solved .board{border-color:#15836a;box-shadow:0 5px 0 #9bd9c8,0 0 0 3px #d7f6e9}
-.play.is-solved .actions{grid-template-columns:1fr}
+.play.is-solved .actions{grid-template-columns:minmax(0,1fr) minmax(0,1.4fr)}
+.play.is-solved .actions:has(#viewRoute[hidden]){grid-template-columns:1fr}
+.cell.auto .cross{opacity:.35;font-weight:500;transform:scale(.8)}
+.cell.failed .cross{color:#c41638;opacity:1;font-weight:900}
 .play.is-solved .actions #reset,.play.is-solved .actions #hint{display:none}
 .play.is-solved #check{min-height:50px;background:linear-gradient(#139779,#087358);box-shadow:0 4px 0 #065340,inset 0 1px 0 #ffffff50}
 .victory-message{border:1px solid #a8ddc8;background:linear-gradient(120deg,#e2f8ed,#f3fff7)!important;text-align:center;padding:10px 12px!important}
